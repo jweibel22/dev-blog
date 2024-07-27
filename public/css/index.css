@@ -53,7 +53,7 @@ html {
 	overflow-y: scroll;
 }
 body {
-	max-width: 40em;
+	max-width: 60em;
 }
 
 /* https://www.a11yproject.com/posts/how-to-hide-content/ */
@@ -204,7 +204,10 @@ header {
 	color: var(--color-gray-90);
 }
 .postlist-date {
+	margin-bottom: 10px;
+	margin-top: 10px;
 	word-spacing: -0.5px;
+	flex-basis: calc(100% - 1.5rem);
 }
 .postlist-link {
 	font-size: 1.1875em; /* 19px /16 */

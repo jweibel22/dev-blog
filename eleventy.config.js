@@ -97,6 +97,45 @@ module.exports = function(eleventyConfig) {
 		return (new Date()).toISOString();
 	})
 
+	eleventyConfig.addPairedShortcode('note', (children) => `
+	<div style='background-color:#26394D; color: #c3c3c3; border-left: solid #37526F 4px; border-radius: 4px; padding:0.3em;'>
+	<span>
+	<p style='margin-top:1em; text-align:center'><b>Real world example</b></p>
+	<div style='margin:2em'>
+	${children}
+	</div>
+	</p>
+	</span>
+	</div>
+	`
+	);
+
+	eleventyConfig.addPairedShortcode('simplequote', (children, author, book) => `
+	<div style='margin-left:15%;margin-right:15%; background-color:#26394D; color: #c3c3c3; border-left: solid #37526F 4px; border-radius: 4px; padding:0.3em;'>
+	<div style='margin:2em'>
+	${children}
+	</div>
+	<p style='margin-bottom:1em; margin-right:1em; text-align:right; font-family:Georgia'> <b>- ${author}</b> <i>(${book})</i>
+	</p>
+	</div>
+	`
+	);
+
+
+	eleventyConfig.addPairedShortcode('quote', (children, title, author, book) => `
+	<div style='margin-left:15%;margin-right:15%; background-color:#26394D; color: #c3c3c3; border-left: solid #37526F 4px; border-radius: 4px; padding:0.7em;'>
+	<span>
+	<p style='margin-top:1em; text-align:center'><b>${title}</b></p>
+	<div style='margin:2em'>
+	${children}
+	</div>
+	<p style='margin-bottom:1em; margin-right:1em; text-align:right; font-family:Georgia'> <b>- ${author}</b> <i>(${book})</i>
+	</p>
+	</span>
+	</div>
+	`
+	);
+
 	// Features to make your build faster (when you need them)
 
 	// If your passthrough copy gets heavy and cumbersome, add this line
