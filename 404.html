@@ -8,25 +8,7 @@
 		<link rel="alternate" href="/dev-blog/feed/feed.xml" type="application/atom+xml" title="Developer Blog">
 		<link rel="alternate" href="/dev-blog/feed/feed.json" type="application/json" title="Developer Blog">
 		
-		<style>/* Message Box */
-.message-box {
-	--color-message-box: #ffc;
-
-	display: block;
-	background-color: var(--color-message-box);
-	color: var(--color-gray-90);
-	padding: 1em 0.625em; /* 16px 10px /16 */
-}
-.message-box ol {
-	margin-top: 0;
-}
-
-@media (prefers-color-scheme: dark) {
-	.message-box {
-		--color-message-box: #082840;
-	}
-}
-* { box-sizing: border-box; }
+		<style>* { box-sizing: border-box; }
 /* Defaults */
 :root {
 	--font-family: -apple-system, system-ui, sans-serif;
@@ -82,7 +64,7 @@ html {
 	overflow-y: scroll;
 }
 body {
-	max-width: 40em;
+	max-width: 60em;
 }
 
 /* https://www.a11yproject.com/posts/how-to-hide-content/ */
@@ -233,7 +215,10 @@ header {
 	color: var(--color-gray-90);
 }
 .postlist-date {
+	margin-bottom: 10px;
+	margin-top: 10px;
 	word-spacing: -0.5px;
+	flex-basis: calc(100% - 1.5rem);
 }
 .postlist-link {
 	font-size: 1.1875em; /* 19px /16 */
@@ -314,17 +299,7 @@ h2 + .header-anchor {
 		</header>
 
 		<main id="skip">
-			<!-- Delete this message, it will also remove the component CSS from the bundle -->
-<div class="message-box">
-	<ol>
-		<li>Edit the <code>_data/metadata.js</code> with your blog’s information.</li>
-		<li>(Optional) Edit <code>eleventy.config.js</code> with your <a href="https://www.11ty.dev/docs/config/">configuration preferences</a>.</li>
-		<li>Delete this message from <code>_includes/layouts/home.njk</code>.</li>
-	</ol>
-	<p><em>This is an <a href="https://www.11ty.dev/">Eleventy project</a> created from the <a href="https://github.com/11ty/eleventy-base-blog"><code>eleventy-base-blog</code> repo</a>.</em></p>
-</div>
-<!-- Stop deleting -->
-
+			
 <h1 id="content-not-found" tabindex="-1">Content not found <a class="header-anchor" href="#content-not-found">#</a></h1>
 <p>Go <a href="/dev-blog/">home</a>.</p>
 <!--
@@ -343,6 +318,6 @@ This will work for both GitHub pages and Netlify:
 
 		<footer></footer>
 
-		<!-- This page `/dev-blog/404.html` was built on 2024-07-21T07:55:39.475Z -->
+		<!-- This page `/dev-blog/404.html` was built on 2024-07-27T06:45:11.600Z -->
 	</body>
 </html>

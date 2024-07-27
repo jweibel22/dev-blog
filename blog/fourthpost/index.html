@@ -176,6 +176,14 @@ pre[class*="language-diff-"] {
 	text-decoration: none; /* override del, ins, mark defaults */
 	color: inherit; /* override del, ins, mark defaults */
 }
+h1, h2, h3 {
+	color: #a07744;
+  }
+
+code {
+    color: #E69C19;
+    padding: 2px 4px;
+}
 * { box-sizing: border-box; }
 /* Defaults */
 :root {
@@ -232,7 +240,7 @@ html {
 	overflow-y: scroll;
 }
 body {
-	max-width: 40em;
+	max-width: 60em;
 }
 
 /* https://www.a11yproject.com/posts/how-to-hide-content/ */
@@ -383,7 +391,10 @@ header {
 	color: var(--color-gray-90);
 }
 .postlist-date {
+	margin-bottom: 10px;
+	margin-top: 10px;
 	word-spacing: -0.5px;
+	flex-basis: calc(100% - 1.5rem);
 }
 .postlist-link {
 	font-size: 1.1875em; /* 19px /16 */
@@ -485,6 +496,6 @@ h2 + .header-anchor {
 
 		<footer></footer>
 
-		<!-- This page `/dev-blog/blog/fourthpost/` was built on 2024-07-21T07:55:39.474Z -->
+		<!-- This page `/dev-blog/blog/fourthpost/` was built on 2024-07-27T06:45:11.600Z -->
 	</body>
 </html>
