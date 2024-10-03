@@ -1,5 +1,6 @@
 ---
 title: Reasons to use a saga library
+description: This post advocates for using a library to build your sagas
 date: 2024-09-27
 tags:
   - Microservices
@@ -95,7 +96,7 @@ In the below example we're constructing a saga that will carry out some action (
 
 Notice how the DAG is explicitly expressed in the code. Also notice that each task is implemented as a separate type. We keep each task in a separate go file and this means that it is easy to get an overview of which tasks exist when looking at the code in the tree navigator. It becomes immediately apparent to the reader that there is a concept called a saga and a task when looking at the folder structure, which was certainly not the case previously where the saga and tasks were buried within events and event handlers. This is an example of applying the principle of [screaming architectures](https://blog.cleancoder.com/uncle-bob/2011/09/30/Screaming-Architecture.html)
 
-Also notice how the saga and DAG construction is separated. A DAG is constructed and registered on the saga. We will get back to this when we talk about versioning in a later section.
+Also notice how the saga and DAG construction is separated. A DAG is constructed and registered on the saga. This will make it possible to handle versioning by registering multiple DAGs on the same saga.
 
 Next let's take a look at how the tasks are implemented. The `someAction` task declares two connectors, OnSuccess and OnFailure. In the implementation of Execute it will, based on the outcome of the side effect that is executed, decide where to go next, to the OnSuccess or to the OnFailure task. The connectors has two type arguments, one being the SagaData type which must correspond the SagaData type on the saga and an Args type which is the type of arguments that the task can take. The connectors allow us to reuse a saga task implementation in multiple sagas by simply plugging in different tasks in the connectors when constructing the DAGs.
 
@@ -119,7 +120,7 @@ func NewSomeAction(
 }
 
 func (i *someAction) Execute(ctx context.Context) sagas.Decider[sagas.EmptyArgs, SagaData] {
-  return func(_ sagas.EmptyArgs, state *saga.State) (saga.Command, error) {
+  return func(_ sagas.EmptyArgs, state *saga.State) saga.Decision[SagaData] {
     if rand.Intn(100) < 50 {
       // well that didn't work, we must follow the rainy day path
       return sagas.Next(i.OnFailure.Resolve(state), args.Empty) 
@@ -153,7 +154,7 @@ func NewCompensatingAction(
 }
 
 func (i *compensatingAction) Execute(ctx context.Context) sagas.Decider[sagas.EmptyArgs, SagaData] {
-  return func(_ sagas.EmptyArgs, state *saga.State) (saga.Command, error) {
+  return func(_ sagas.EmptyArgs, state *saga.State) saga.Decision[SagaData] {
     err := makeRemoteCall()
     if err != nil {
       if errors.Is(err, BadRequest) {

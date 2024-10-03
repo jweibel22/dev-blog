@@ -1,6 +1,6 @@
 ---
-title: Running fast
-description: Build tooling that will make your run work faster
+title: How to run faster
+description: Sharing an example of how to build tooling that will make your run work faster
 date: 2024-07-24
 tags:
   - Developer productivity
