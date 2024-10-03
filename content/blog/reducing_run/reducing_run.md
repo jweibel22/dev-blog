@@ -55,22 +55,21 @@ A global `dry_run` boolean variable is defined that defaults to `True`. When ena
 
 ## Console
 
-Pycharm provides a REPL (called python console) out of the box. use case: good when logging is not comprehensive so it can be hard to trace (it's hard to predict what to log), so data can be retrieved from the db.
+Pycharm provides a REPL (called python console) out of the box. The interactive nature of the console makes it perfect for exploration and debugging scenarios. E.g. sometimes you'll find that your logging verbosity is insufficient and you'll need to look at the actual state of your application to understand what has happened. We used the console as a way to gain access to all the databases of our services. In this section we'll go through an example scenario to illustrate the usefulness of the console.
 
-In the `Settings` window you can configure a startup script. We added a `console_startup.py` file to the project and all engineers added a one liner script to the `Settings` referencing this python file. The `console_startup.py` file would load environment variables from a  `.env` file and import all common packages that we wanted to be available right away in the console. It would also trigger an aws login if credentials had expired.
-
-TODO: change image size to 60em (width of text)
-{% image "./python_console.png", "", [900] %}
-
-Looking at the run board and discovering that sagas have gotten stuck:
+Imagine you're looking at a dashboard and is discovering that some sagas have gotten stuck:
 
 {% image "./runboard.png", "", [900] %}
 
-Then going to the python console in Pycharm and trying to find out what happened. After looking up the failed sagas in the console it turns out that a few of them failed due to a null pointer exception. Turns out there was a bug in the code triggered by a special edge case. We fix the bug in the code and redeploy. The sagas that failed with this particular error can now be retried.
+The next step would be going to the python console in Pycharm and trying to find out what happened. When the console is opened the user will get logged in and a prompt appears.
+
+{% image "./python_console.png", "", [900] %}
+
+After looking up the failed sagas in the console it turns out that a few of them failed due to a null pointer exception. Turns out there was a bug in the code triggered by an unexpected edge case. We fix the bug in the code and redeploy. The sagas that failed with this particular error can now be retried.
 
 {% image "./retry_sagas_2.png", "", [1000] %}
 
-The function for retrieving the set of failed sagas is very simple. It simply fetches the data from a database table and loads it into a pandas dataframe.
+A `sagas.py` file, that was shared across all services, declared various functions that could be used to manage sagas. The reason the code in `sagas.py` could be shared across services was that the services were using the same saga library. The function for retrieving the set of failed sagas is very simple. It simply fetches the data from a database table and loads it into a pandas dataframe. Here's an excerpt from the `sagas.py` file:
 
 ```python
 import pandas as pd
@@ -80,6 +79,16 @@ def get_failed(db_name):
     query = f"""select * from supervisor_view where completed=false and error_message is not null"""
     result = pd.read_sql(query, db.sqlalchemy_connect(db_name))
     return result
+```
+
+
+The `transfer_service.py` file called this function:
+
+```python 
+db_name = 'transferservice'
+
+def get_failed_sagas():
+    return sagas.get_failed(db_name)
 ```
 
 Let's say you needed more domain insights. As an example, it could be necessary to find out the amount of funds that had been withheld due to the stuck transfers. This can be achieved by looking up details from the transfer aggregates.
@@ -94,10 +103,10 @@ Similary data can be fetched from other data sources, e.g. application logs, and
 
 Pycharm will open the notebook view for files of type `ipynb` and will automatically start a local jupyter notebook server for you. Notebooks has a sequence of cells that contain the python code. If the python code in a cell returns anything or prints to standard out it will be printed in the notebook after the cell. Notebooks are very useful when the run script is complex or requires some diagnosis/analysis before the fix can be determined and applied, because the notebook "tells a story".
 
-In the example given in the notebook below a saga got stuck because something unexpected happened, i.e. a service returned an error that the saga could not handle. In this case the easiest way to solve the issue was to do a manual corrective action, transfer some funds, and then force complete the saga. I.e. instead of trying to extend the saga implementation to be able to handle the pathological case the engineer takes over the responsibility of the specific flow from the saga by doing a manual action and then completing the saga.
+In the example given in the notebook below a saga got stuck because something unexpected happened, i.e. a service returned an error that the saga could not handle. In this case the easiest way to solve the issue was to do a manual corrective action, i.e. transfer some funds, and then force complete the saga. I.e. instead of trying to extend the saga implementation to be able to handle the pathological case the engineer takes over the responsibility of the specific flow from the saga by doing a manual action and then completing the saga.
 
-{% image "./nb1.png", "", [1000] %}
-{% image "./nb2.png", "", [1000] %}
+{% image "./nb_top.png", "", [1000] %}
+{% image "./nb_bottom.png", "", [1000] %}
 
 Since this case involves transferring of funds it might be a good idea to have the script reviewed by a peer before executing it. That can be done by executing the notebook and answering yes in the input dialog that appears when the `dry_run.ask()` statement is executed. That way all cells will run and intended side effects will get printed as output but no side effects are executed. A PR containing the notebook output can then be reviewed by a peer before the notebook is finally executed with dry run disabled.
 
