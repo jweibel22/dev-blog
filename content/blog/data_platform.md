@@ -2,7 +2,6 @@
 title: How to reach production in less than 6 months
 description: A collection of ideas on how to get from scratch to an MVP in the shortest possible time
 date: 2024-08-02
-draft: true
 tags:
   - Data
   - Developer productivity
