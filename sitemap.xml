@@ -2,62 +2,62 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 	
 	<url>
-		<loc>https://example.com/dev-blog/blog/firstpost/</loc>
-		<lastmod>2018-05-02</lastmod>
+		<loc>https://example.com/dev-blog/blog/terra_incognita/</loc>
+		<lastmod>2024-06-21</lastmod>
 	</url>
 	
 	<url>
-		<loc>https://example.com/dev-blog/blog/secondpost/</loc>
-		<lastmod>2018-07-04</lastmod>
+		<loc>https://example.com/dev-blog/blog/fail_fast/</loc>
+		<lastmod>2024-07-04</lastmod>
 	</url>
 	
 	<url>
-		<loc>https://example.com/dev-blog/blog/thirdpost/</loc>
-		<lastmod>2018-08-24</lastmod>
+		<loc>https://example.com/dev-blog/blog/reducing_run/</loc>
+		<lastmod>2024-07-24</lastmod>
 	</url>
 	
 	<url>
-		<loc>https://example.com/dev-blog/blog/fourthpost/</loc>
-		<lastmod>2018-09-30</lastmod>
+		<loc>https://example.com/dev-blog/blog/sagas/</loc>
+		<lastmod>2024-09-27</lastmod>
 	</url>
 	
 	<url>
 		<loc>https://example.com/dev-blog/about/</loc>
-		<lastmod>2024-07-27</lastmod>
+		<lastmod>2024-10-04</lastmod>
 	</url>
 	
 	<url>
 		<loc>https://example.com/dev-blog/blog/</loc>
-		<lastmod>2024-07-27</lastmod>
+		<lastmod>2024-10-04</lastmod>
 	</url>
 	
 	<url>
 		<loc>https://example.com/dev-blog/</loc>
-		<lastmod>2024-07-27</lastmod>
+		<lastmod>2024-10-04</lastmod>
 	</url>
 	
 	<url>
 		<loc>https://example.com/dev-blog/tags/</loc>
-		<lastmod>2024-07-27</lastmod>
+		<lastmod>2024-10-04</lastmod>
 	</url>
 	
 	<url>
-		<loc>https://example.com/dev-blog/tags/another-tag/</loc>
-		<lastmod>2024-07-27</lastmod>
+		<loc>https://example.com/dev-blog/tags/data/</loc>
+		<lastmod>2024-10-04</lastmod>
 	</url>
 	
 	<url>
-		<loc>https://example.com/dev-blog/tags/number-2/</loc>
-		<lastmod>2024-07-27</lastmod>
+		<loc>https://example.com/dev-blog/tags/developer-productivity/</loc>
+		<lastmod>2024-10-04</lastmod>
 	</url>
 	
 	<url>
-		<loc>https://example.com/dev-blog/tags/second-tag/</loc>
-		<lastmod>2024-07-27</lastmod>
+		<loc>https://example.com/dev-blog/tags/microservices/</loc>
+		<lastmod>2024-10-04</lastmod>
 	</url>
 	
 	<url>
-		<loc>https://example.com/dev-blog/tags/posts-with-two-tags/</loc>
-		<lastmod>2024-07-27</lastmod>
+		<loc>https://example.com/dev-blog/tags/domain-driven-design/</loc>
+		<lastmod>2024-10-04</lastmod>
 	</url>
 </urlset>

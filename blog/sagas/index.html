@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Reasons to use a saga library</title>
+		<meta name="description" content="This post advocates for using a library to build your sagas">
+		<link rel="alternate" href="/dev-blog/feed/feed.xml" type="application/atom+xml" title="Developer Blog">
+		<link rel="alternate" href="/dev-blog/feed/feed.json" type="application/json" title="Developer Blog">
+		
+		<style>/**
+ * okaidia theme for JavaScript, CSS and HTML
+ * Loosely based on Monokai textmate theme by http://www.monokai.nl/
+ * @author ocodia
+ */
+
+code[class*="language-"],
+pre[class*="language-"] {
+	color: #f8f8f2;
+	background: none;
+	text-shadow: 0 1px rgba(0, 0, 0, 0.3);
+	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+	font-size: 1em;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+	word-wrap: normal;
+	line-height: 1.5;
+
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+	tab-size: 4;
+
+	-webkit-hyphens: none;
+	-moz-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+	padding: 1em;
+	margin: .5em 0;
+	overflow: auto;
+	border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+	background: #272822;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+	padding: .1em;
+	border-radius: .3em;
+	white-space: normal;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+	color: #8292a2;
+}
+
+.token.punctuation {
+	color: #f8f8f2;
+}
+
+.token.namespace {
+	opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.constant,
+.token.symbol,
+.token.deleted {
+	color: #f92672;
+}
+
+.token.boolean,
+.token.number {
+	color: #ae81ff;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+	color: #a6e22e;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string,
+.token.variable {
+	color: #f8f8f2;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.function,
+.token.class-name {
+	color: #e6db74;
+}
+
+.token.keyword {
+	color: #66d9ef;
+}
+
+.token.regex,
+.token.important {
+	color: #fd971f;
+}
+
+.token.important,
+.token.bold {
+	font-weight: bold;
+}
+.token.italic {
+	font-style: italic;
+}
+
+.token.entity {
+	cursor: help;
+}
+/*
+ * New diff- syntax
+ */
+
+pre[class*="language-diff-"] {
+	--eleventy-code-padding: 1.25em;
+	padding-left: var(--eleventy-code-padding);
+	padding-right: var(--eleventy-code-padding);
+}
+.token.deleted {
+	background-color: hsl(0, 51%, 37%);
+	color: inherit;
+}
+.token.inserted {
+	background-color: hsl(126, 31%, 39%);
+	color: inherit;
+}
+
+/* Make the + and - characters unselectable for copy/paste */
+.token.prefix.unchanged,
+.token.prefix.inserted,
+.token.prefix.deleted {
+	-webkit-user-select: none;
+	user-select: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+.token.prefix.inserted,
+.token.prefix.deleted {
+	width: var(--eleventy-code-padding);
+	background-color: rgba(0,0,0,.2);
+}
+
+/* Optional: full-width background color */
+.token.inserted:not(.prefix),
+.token.deleted:not(.prefix) {
+	display: block;
+	margin-left: calc(-1 * var(--eleventy-code-padding));
+	margin-right: calc(-1 * var(--eleventy-code-padding));
+	text-decoration: none; /* override del, ins, mark defaults */
+	color: inherit; /* override del, ins, mark defaults */
+}
+h1, h2, h3 {
+	color: #a07744;
+  }
+
+code {
+    color: #E69C19;
+    padding: 2px 4px;
+}
+* { box-sizing: border-box; }
+/* Defaults */
+:root {
+	--font-family: -apple-system, system-ui, sans-serif;
+	--font-family-monospace: Consolas, Menlo, Monaco, Andale Mono WT, Andale Mono, Lucida Console, Lucida Sans Typewriter, DejaVu Sans Mono, Bitstream Vera Sans Mono, Liberation Mono, Nimbus Mono L, Courier New, Courier, monospace;
+}
+
+/* Theme colors */
+:root {
+	--color-gray-20: #e0e0e0;
+	--color-gray-50: #C0C0C0;
+	--color-gray-90: #333;
+
+	--background-color: #fff;
+
+	--text-color: var(--color-gray-90);
+	--text-color-link: #082840;
+	--text-color-link-active: #5f2b48;
+	--text-color-link-visited: #17050F;
+
+	--syntax-tab-size: 2;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--color-gray-20: #e0e0e0;
+		--color-gray-50: #C0C0C0;
+		--color-gray-90: #dad8d8;
+
+		/* --text-color is assigned to --color-gray-_ above */
+		--text-color-link: #1493fb;
+		--text-color-link-active: #6969f7;
+		--text-color-link-visited: #a6a6f8;
+
+		--background-color: #15202b;
+	}
+}
+
+
+/* Global stylesheet */
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	padding: 0;
+	margin: 0 auto;
+	font-family: var(--font-family);
+	color: var(--text-color);
+	background-color: var(--background-color);
+}
+html {
+	overflow-y: scroll;
+}
+body {
+	max-width: 60em;
+}
+
+/* https://www.a11yproject.com/posts/how-to-hide-content/ */
+.visually-hidden {
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	height: 1px;
+	overflow: hidden;
+	position: absolute;
+	white-space: nowrap;
+	width: 1px;
+}
+
+p:last-child {
+	margin-bottom: 0;
+}
+p {
+	line-height: 1.5;
+}
+
+li {
+	line-height: 1.5;
+}
+
+a[href] {
+	color: var(--text-color-link);
+}
+a[href]:visited {
+	color: var(--text-color-link-visited);
+}
+a[href]:hover,
+a[href]:active {
+	color: var(--text-color-link-active);
+}
+
+main {
+	padding: 1rem;
+}
+main :first-child {
+	margin-top: 0;
+}
+
+header {
+	border-bottom: 1px dashed var(--color-gray-20);
+}
+header:after {
+	content: "";
+	display: table;
+	clear: both;
+}
+
+.links-nextprev {
+	list-style: none;
+	border-top: 1px dashed var(--color-gray-20);
+	padding: 1em 0;
+}
+
+table {
+	margin: 1em 0;
+}
+table td,
+table th {
+	padding-right: 1em;
+}
+
+pre,
+code {
+	font-family: var(--font-family-monospace);
+}
+pre:not([class*="language-"]) {
+	margin: .5em 0;
+	line-height: 1.375; /* 22px /16 */
+	-moz-tab-size: var(--syntax-tab-size);
+	-o-tab-size: var(--syntax-tab-size);
+	tab-size: var(--syntax-tab-size);
+	-webkit-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+	direction: ltr;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+}
+code {
+	word-break: break-all;
+}
+
+/* Header */
+header {
+	display: flex;
+	gap: 1em .5em;
+	flex-wrap: wrap;
+	align-items: center;
+	padding: 1em;
+}
+.home-link {
+	font-size: 1em; /* 16px /16 */
+	font-weight: 700;
+	margin-right: 2em;
+}
+.home-link:link:not(:hover) {
+	text-decoration: none;
+}
+
+/* Nav */
+.nav {
+	display: flex;
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+.nav-item {
+	display: inline-block;
+	margin-right: 1em;
+}
+.nav-item a[href]:not(:hover) {
+	text-decoration: none;
+}
+.nav a[href][aria-current="page"] {
+	text-decoration: underline;
+}
+
+/* Posts list */
+.postlist {
+	list-style: none;
+	padding: 0;
+	padding-left: 1.5rem;
+}
+.postlist-item {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	counter-increment: start-from -1;
+	margin-bottom: 1em;
+}
+.postlist-item:before {
+	display: inline-block;
+	pointer-events: none;
+	content: "" counter(start-from, decimal-leading-zero) ". ";
+	line-height: 100%;
+	text-align: right;
+	margin-left: -1.5rem;
+}
+.postlist-date,
+.postlist-item:before {
+	font-size: 0.8125em; /* 13px /16 */
+	color: var(--color-gray-90);
+}
+.postlist-date {
+	margin-bottom: 10px;
+	margin-top: 10px;
+	word-spacing: -0.5px;
+	flex-basis: calc(100% - 1.5rem);
+}
+.postlist-link {
+	font-size: 1.1875em; /* 19px /16 */
+	font-weight: 700;
+	flex-basis: calc(100% - 1.5rem);
+	padding-left: .25em;
+	padding-right: .5em;
+	text-underline-position: from-font;
+	text-underline-offset: 0;
+	text-decoration-thickness: 1px;
+}
+.postlist-item-active .postlist-link {
+	font-weight: bold;
+}
+
+/* Tags */
+.post-tag {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	text-transform: capitalize;
+	font-style: italic;
+}
+.postlist-item > .post-tag {
+	align-self: center;
+}
+
+/* Tags list */
+.post-metadata {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: .5em;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+.post-metadata time {
+	margin-right: 1em;
+}
+
+/* Direct Links / Markdown Headers */
+.header-anchor {
+	text-decoration: none;
+	font-style: normal;
+	font-size: 1em;
+	margin-left: .1em;
+}
+a[href].header-anchor,
+a[href].header-anchor:visited {
+	color: transparent;
+}
+a[href].header-anchor:focus,
+a[href].header-anchor:hover {
+	text-decoration: underline;
+}
+a[href].header-anchor:focus,
+:hover > a[href].header-anchor {
+	color: #aaa;
+}
+
+h2 + .header-anchor {
+	font-size: 1.5em;
+}</style>
+	</head>
+	<body>
+		<a href="#skip" class="visually-hidden">Skip to main content</a>
+
+		<header>
+			<a href="/dev-blog/" class="home-link">Developer Blog</a>
+			<nav>
+				<h2 class="visually-hidden">Top level navigation menu</h2>
+				<ul class="nav">
+					<li class="nav-item"><a href="/dev-blog/">Home</a></li>
+					<li class="nav-item"><a href="/dev-blog/blog/">Archive</a></li>
+					<li class="nav-item"><a href="/dev-blog/about/">About Me</a></li>
+				</ul>
+			</nav>
+		</header>
+
+		<main id="skip">
+			
+<h1>Reasons to use a saga library</h1>
+
+<ul class="post-metadata">
+	<li><time datetime="2024-09-27">27 September 2024</time></li>
+	<li><a href="/dev-blog/tags/microservices/" class="post-tag">Microservices</a></li>
+</ul>
+
+<p>When building a backend using the microservices architecture you'll most likely find yourself in a situation where you need to execute a transaction or a business workflow that spans multiple services. Since each service has its own data store maintaining consistency is non trivial, if one of the individual transactions that make up the distributed transaction fails it is necessary to roll back everything to get back to a consistent state. A few data stores provides distributed ACID transactions via 2PC (two phase commits) but 2PC are notoriously difficult to work with, breaks service encapsulation and can have a serious impact on performance due to lock congestion. For these reasons it is common practice to embrace eventual consistency and implement distributed transactions using the saga pattern.</p>
+<p></p><div style="background-color:#26394D; color: #c3c3c3; border-left: solid #37526F 4px; border-radius: 4px; padding:0.3em;">
+<span>
+<p style="margin-top:1em; text-align:center"><b>Terminology</b></p>
+<div style="margin:2em"><p></p>
+<p>In the definition of sagas used by <a href="(https:/microservices.io/patterns/data/saga.html)">Chris Richardson</a> (and others) sagas can either be orchestrated or choreographed. The implementation of a choreographed saga is distributed amongst the participating services, each service is subscribing to a set of events and will reactively execute side effects and possibly publish new events to the event bus that will move the process forward. This is an event driven approach that fosters a loose coupling between the services. Conversely an orchestrated saga is implemented by a single service that has the responsibility of keeping track of the state of the process, making calls to other services in a sequence of steps. This can result in a more tightly coupled architecture but the fact that the responsibility of the flow is anchored inside a single service makes it easier to debug and operate the sagas. Both approaches have their merits but this particular post is about orchestrating sagas.</p>
+<p>Sagas are often referred to as <a href="https://learn.microsoft.com/en-us/previous-versions/msp-n-p/jj591569(v=pandp.10)?redirectedfrom=MSDN#what-is-a-process-manager">process managers</a> in the DDD community. Introducing a process manager into an architecture is a decision to model the process explicitly using the process manager rather than having the process modelled implicitly by having the aggregates communicate directly via commands and events. In the terminology of Chris Richardson you can therefore think of the process manager as an orchestrating saga.</p>
+<p></p></div>
+<p></p>
+</span>
+</div><p></p>
+<h2 id="sagas-as-first-class-citizens" tabindex="-1">Sagas as first class citizens <a class="header-anchor" href="#sagas-as-first-class-citizens">#</a></h2>
+<p>I was once working on a project where our aggregates were modelled using event sourcing and sagas were implemented as any other aggregate. Often an aggregate representing a business entity would also act as a saga, taking responsibility of calling other aggregates. The remote calls were carried out by event handlers on the domain events of the saga and  when the remote call finished a new domain event was written to the event store causing the next event handler to be triggered. There were a few problems with this approach.</p>
+<p>First of all an orchestrating saga is essentially a DAG consisting of the set of tasks that needs to be taken and ideally the code should reflect this. However in the approach depicted above the DAG was essentially modelled using reactive code, each task being represented by an event handler, and progressing to the next step was done by writing an event which then reactively triggered the next task. This impedance mismatch, the misalignment between what is being modelled and how it is represented in the code made it hard to read. It was quite difficult to get a holistic overview of the DAG because it required jumping around the code base between different events and event handlers. One symptom of this was that the team were maintaining UML diagrams of all the sagas that were implemented. These diagrams were necessary to keep up to date to help the developers understand the workflow, because it was simply too difficult (time consuming) to obtain a mental image of the workflow by reading the code itself.</p>
+<p>Secondly since the business entity and the saga was modelled by the same object it became difficult to separate orchestration problems from business problems. E.g. some remote calls were async which meant that it was necessary to write two events related to the call to the event store. First an event representing the intention to make the call and the following representing the result of the call. Obviously this meant that if we needed to make changes to the orchestration for technical reasons, replacing an async API with a sync API, implementing the change would involving making changes to the event stream which was also used to represent the state of the business entity.</p>
+<p>Another problem was how to handle event replay. Replaying events is a common practice in event sourcing which allows e.g. to rebuild views that are based on the events from the event store, however since the saga actions were implemented as event handlers on those events this could result in unwanted side effects as already completed sagas would then start making remote calls.</p>
+<p>Lastly implementing orchestrating sagas is non trivial. It involves keeping track of the saga state, implementing retries and keeping track of stuck or failed sagas and we discovered that operating the sagas involved many commonalities. A saga could get stuck due to some remote system not responding or an expected event not arriving, they could end up in an unexpected situation from which they couldn't progress needing human assistance. We found ourselves implementing the same  patterns over and over again, e.g. implementing observability and endpoints that allowed us to resume a stuck saga.</p>
+<p>In the end we decided to model sagas explicitly and keep all orchestration responsibilities out of the business entities. Since modelling the sagas were now independent of the domain logic it allowed us to implement a library providing generic saga functionality that could be reused across domains. In the following sections I'll go through some of this common functionality.</p>
+<h3 id="observability" tabindex="-1">Observability <a class="header-anchor" href="#observability">#</a></h3>
+<p>Keeping track of failed or stuck sagas is obviously quite important. The saga library maintained a database table listing all sagas, a row in the table showed the active task and a lastUpdated timestamp for a saga. Failed sagas were sagas that had ended up in the special <code>FailWithUnknownError</code> state and stuck sagas were sagas that had not made a state change in a while. The information in this table was used as the basis for prometheus metrics that reported on stuck and failed transfers and once alerted we could consult this table to get an overview of which sagas were having issues.</p>
+<p>The saga library was built using an in-house event sourcing library, that choice was not so much based on an opinion that modelling sagas using event sourcing was a good approach, but more on the fact that it was commonly used and we had a lot of experience with it. Using an event sourcing library meant that the entire saga history was automatically saved in the event store. This meant that in a debug scenario, apart from consulting the logs, if more details were needed regarding what data was sent or IDs used the saga event history could be consulted.</p>
+<h3 id="ops" tabindex="-1">Ops <a class="header-anchor" href="#ops">#</a></h3>
+<p>Many different types of orchestration related errors can happen in production. Some of them may cause a saga to become stuck or take wrong decisions and it must be possible to rectify these situations. E.g. a bug in the saga code, e.g. it was not able to recognize a valid response code from an API, could cause it to end up in <code>FailWithUnknownError</code>. In this case the corrective action would be to fix the bug in the saga code and move the saga back to the task that failed to execute. Of course the bug that caused the saga to misbehave could also originate from one of the remote systems that the saga interacts with. This could e.g. cause an API call to fail unexpectedly making the saga jump to the special <code>FailWithUnknownError</code> state. Again this must be fixed by fixing the bug in the remote system and move the saga back to the task that failed to execute.</p>
+<p>Much more complicated issues can arise. E.g. a bug can cause the saga to take wrong decisions and make incorrect remote calls, causing the distributed system to end up in an inconsistent state. In such situations it is often better to simply force complete the saga, and have a developer take over the responsibility for the state normally managed by the saga. If the APIs of the remote systems are available to be called manually the developer can make the corrective actions manually. The alternative, to enable the saga to get out of the situation by coding in the required flow will add complexity to the saga but since the situation was caused by a bug it is unlikely to ever end up in the same situation again so this part of the saga will not be useful later and only cause confusion to future developers who may not be familiar with the particular incident and understand why that particular behaviour is implemented.</p>
+<p>A <code>mission control</code> API could be used to manually control the saga behaviour at runtime. Here we list some of the available methods.</p>
+<ul>
+<li><strong>Next Task</strong>: Move the saga with the specified type and ID to the specified task.</li>
+<li><strong>Force Complete</strong>: Force completes the saga.</li>
+<li><strong>Retry Task</strong>: A saga is stuck in a task (it never moved to the next task, this can happen when using an <code>asyncTask</code>) and we'd like to manually retry it.</li>
+<li><strong>Update Data</strong>: A bug in the saga code caused it to write some wrong data to its state. This method can be used to mutate the saga data.</li>
+</ul>
+<p>The methods were exposed in our run script setup which has been described here <a href="/dev-blog/blog/reducing_run/">Running fast</a> This allowed us e.g. to quickly handle cases where many sagas had failed or gotten stuck due to the same reason, this was a simple matter of looping through the sagas in the saga overview table and calling the mission control function.</p>
+<h3 id="versioning" tabindex="-1">Versioning <a class="header-anchor" href="#versioning">#</a></h3>
+<p>It is quite common to end up in a situation where it is necessary to make breaking changes to the saga flow. In this context breaking changes means a change to the saga flow that is incompatible with the existing flow, which means, if code changes were to be deployed while sagas using the old saga implementation were in-flight this would cause wrong behaviour. E.g.  changing the order of tasks or replacing one remote API with a another API could in some situations be breaking changes.</p>
+<p>We supported versioning by attaching a version property to a DAG and allowing to register multiple DAGs of different versions to the same saga. A saga was triggered by the <code>sagas.Start</code> method which takes in a version parameter. To make breaking changes to a saga the developer workflow was to create a new version of the DAG and register it on the saga, change the code that starts the saga to use the new version, wait for all sagas that were based on the deprecated DAG to complete in production and finally remove the old DAG from the code.</p>
+<p>If we had not built or used a saga framework then the saga implementations would have been entangled with the domain specific business logic. This means that figuring out how to make a breaking change to a saga flow would be a domain specific problem and would thus have to solved, in a new way, every time the problem arose.</p>
+<h3 id="postponement" tabindex="-1">Postponement <a class="header-anchor" href="#postponement">#</a></h3>
+<p>Sometimes our sagas needed to wait for a period of time before continuing. This was also turned into a feature in the saga library that allowed a task to postpone itself for a specified period of time.</p>
+<h2 id="the-code" tabindex="-1">The code <a class="header-anchor" href="#the-code">#</a></h2>
+<p>This post is not really a presentation of the specific library, but for completeness I'll show some examples.</p>
+<p>In the below example we're constructing a saga that will carry out some action (e.g. call some remote system) and if it fails it will carry out some compensating action. The example is a bit contrived, normally you wouldn't need to carry out a compensating action unless some previous actions actually succeeded, however to keep the example code short we skipped that part. The <code>done</code> task is a task provided by the saga library that will simply complete the saga.</p>
+<pre class="language-go" tabindex="0"><code class="language-go">
+  <span class="token keyword">type</span> SagaData <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+    RememberThis <span class="token builtin">string</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">var</span> <span class="token punctuation">(</span>
+    sagaName            <span class="token operator">=</span> types<span class="token punctuation">.</span><span class="token function">Name</span><span class="token punctuation">(</span><span class="token string">"mysaga"</span><span class="token punctuation">)</span>
+    saga                <span class="token operator">=</span> factory<span class="token punctuation">.</span><span class="token function">NewSaga</span><span class="token punctuation">(</span>sagaName<span class="token punctuation">)</span>
+    someAction          <span class="token operator">=</span> tasks<span class="token punctuation">.</span><span class="token function">NewSomeAction</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    compensatingAction  <span class="token operator">=</span> tasks<span class="token punctuation">.</span><span class="token function">NewCompensatingAction</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    done                <span class="token operator">=</span> commontasks<span class="token punctuation">.</span><span class="token function">NewComplete</span><span class="token punctuation">(</span>saga<span class="token punctuation">)</span>
+  <span class="token punctuation">)</span>
+
+  dag <span class="token operator">:=</span> sagas<span class="token punctuation">.</span>NewDag<span class="token punctuation">[</span>SagaData<span class="token punctuation">]</span><span class="token punctuation">(</span>types<span class="token punctuation">.</span>UnspecifiedVersion<span class="token punctuation">)</span>
+  dag<span class="token punctuation">.</span><span class="token function">StartFrom</span><span class="token punctuation">(</span>someAction<span class="token punctuation">)</span><span class="token punctuation">.</span>
+    <span class="token function">Transitions</span><span class="token punctuation">(</span>
+      someAction<span class="token punctuation">.</span>OnSuccess<span class="token punctuation">.</span><span class="token function">GoTo</span><span class="token punctuation">(</span>done<span class="token punctuation">)</span><span class="token punctuation">,</span>
+      someAction<span class="token punctuation">.</span>OnFailure<span class="token punctuation">.</span><span class="token function">GoTo</span><span class="token punctuation">(</span>compensatingAction<span class="token punctuation">)</span><span class="token punctuation">,</span>
+      compensatingAction<span class="token punctuation">.</span>OnSuccess<span class="token punctuation">.</span><span class="token function">GoTo</span><span class="token punctuation">(</span>done<span class="token punctuation">)</span><span class="token punctuation">,</span>
+  <span class="token punctuation">)</span>
+
+  saga<span class="token punctuation">.</span><span class="token function">RegisterDag</span><span class="token punctuation">(</span>dag<span class="token punctuation">)</span></code></pre>
+<p>Notice how the DAG is explicitly expressed in the code. Also notice that each task is implemented as a separate type. We keep each task in a separate go file and this means that it is easy to get an overview of which tasks exist when looking at the code in the tree navigator. It becomes immediately apparent to the reader that there is a concept called a saga and a task when looking at the folder structure, which was certainly not the case previously where the saga and tasks were buried within events and event handlers. This is an example of applying the principle of <a href="https://blog.cleancoder.com/uncle-bob/2011/09/30/Screaming-Architecture.html">screaming architectures</a></p>
+<p>Also notice how the saga and DAG construction is separated. A DAG is constructed and registered on the saga. This will make it possible to handle versioning by registering multiple DAGs on the same saga.</p>
+<p>Next let's take a look at how the tasks are implemented. The <code>someAction</code> task declares two connectors, OnSuccess and OnFailure. In the implementation of Execute it will, based on the outcome of the side effect that is executed, decide where to go next, to the OnSuccess or to the OnFailure task. The connectors has two type arguments, one being the SagaData type which must correspond the SagaData type on the saga and an Args type which is the type of arguments that the task can take. The connectors allow us to reuse a saga task implementation in multiple sagas by simply plugging in different tasks in the connectors when constructing the DAGs.</p>
+<pre class="language-go" tabindex="0"><code class="language-go"><span class="token keyword">type</span> someAction <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+  <span class="token operator">*</span>sagas<span class="token punctuation">.</span>Task<span class="token punctuation">[</span>sagas<span class="token punctuation">.</span>EmptyArgs<span class="token punctuation">,</span> SagaData<span class="token punctuation">]</span>
+
+  OnSuccess <span class="token operator">*</span>sagas<span class="token punctuation">.</span>Connector<span class="token punctuation">[</span>sagas<span class="token punctuation">.</span>EmptyArgs<span class="token punctuation">,</span> SagaData<span class="token punctuation">]</span>
+  OnFailure <span class="token operator">*</span>sagas<span class="token punctuation">.</span>Connector<span class="token punctuation">[</span>sagas<span class="token punctuation">.</span>EmptyArgs<span class="token punctuation">,</span> SagaData<span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">NewSomeAction</span><span class="token punctuation">(</span>
+<span class="token punctuation">)</span> <span class="token operator">*</span>someAction <span class="token punctuation">{</span>
+  task <span class="token operator">:=</span> <span class="token operator">&amp;</span>someAction<span class="token punctuation">{</span>
+    Task<span class="token punctuation">:</span> sagas<span class="token punctuation">.</span>NewTask<span class="token punctuation">[</span>sagas<span class="token punctuation">.</span>EmptyArgs<span class="token punctuation">,</span> SagaData<span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+  <span class="token punctuation">}</span>
+  task<span class="token punctuation">.</span>OnSuccess <span class="token operator">=</span> sagas<span class="token punctuation">.</span>NewConnector<span class="token punctuation">[</span>sagas<span class="token punctuation">.</span>EmptyArgs<span class="token punctuation">,</span> SagaData<span class="token punctuation">]</span><span class="token punctuation">(</span>task<span class="token punctuation">)</span>
+  task<span class="token punctuation">.</span>OnFailure <span class="token operator">=</span> sagas<span class="token punctuation">.</span>NewConnector<span class="token punctuation">[</span>sagas<span class="token punctuation">.</span>EmptyArgs<span class="token punctuation">,</span> SagaData<span class="token punctuation">]</span><span class="token punctuation">(</span>task<span class="token punctuation">)</span>
+
+  <span class="token keyword">return</span> task
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>i <span class="token operator">*</span>someAction<span class="token punctuation">)</span> <span class="token function">Execute</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">)</span> sagas<span class="token punctuation">.</span>Decider<span class="token punctuation">[</span>sagas<span class="token punctuation">.</span>EmptyArgs<span class="token punctuation">,</span> SagaData<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token boolean">_</span> sagas<span class="token punctuation">.</span>EmptyArgs<span class="token punctuation">,</span> state <span class="token operator">*</span>saga<span class="token punctuation">.</span>State<span class="token punctuation">)</span> saga<span class="token punctuation">.</span>Decision<span class="token punctuation">[</span>SagaData<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> rand<span class="token punctuation">.</span><span class="token function">Intn</span><span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">50</span> <span class="token punctuation">{</span>
+      <span class="token comment">// well that didn't work, we must follow the rainy day path</span>
+      <span class="token keyword">return</span> sagas<span class="token punctuation">.</span><span class="token function">Next</span><span class="token punctuation">(</span>i<span class="token punctuation">.</span>OnFailure<span class="token punctuation">.</span><span class="token function">Resolve</span><span class="token punctuation">(</span>state<span class="token punctuation">)</span><span class="token punctuation">,</span> args<span class="token punctuation">.</span>Empty<span class="token punctuation">)</span> 
+    <span class="token punctuation">}</span>
+    <span class="token comment">// all good, follow the happy path</span>
+    <span class="token keyword">return</span> sagas<span class="token punctuation">.</span><span class="token function">Next</span><span class="token punctuation">(</span>i<span class="token punctuation">.</span>OnSuccess<span class="token punctuation">.</span><span class="token function">Resolve</span><span class="token punctuation">(</span>state<span class="token punctuation">)</span><span class="token punctuation">,</span> args<span class="token punctuation">.</span>Empty<span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<p>The <code>compensatingAction</code> task has a single connector, OnSuccess, there is no OnFailure connector as there is no expected way it can fail. If it fails for unexpected reasons the task will move the saga into the <code>FailedWithUnknownError</code> state. This is a special state that all sagas can end up in. When a saga is in that state it must be moved out of the state manually by calling one of the methods on the <code>mission control</code> API that we will discuss in detail in a later section.</p>
+<p>The <code>FailedWithUnknownError</code> state is used to handle all the situations that cannot be handled automatically, either because they were unexpected and therefore the saga code did not take that scenario into consideration, or because there simply is no supported way to handle the situation automatically. We will discuss this in more detail later.</p>
+<pre class="language-go" tabindex="0"><code class="language-go"><span class="token keyword">type</span> compensatingAction <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+  <span class="token operator">*</span>sagas<span class="token punctuation">.</span>Task<span class="token punctuation">[</span>sagas<span class="token punctuation">.</span>EmptyArgs<span class="token punctuation">,</span> SagaData<span class="token punctuation">]</span>
+
+  OnSuccess <span class="token operator">*</span>sagas<span class="token punctuation">.</span>Connector<span class="token punctuation">[</span>sagas<span class="token punctuation">.</span>EmptyArgs<span class="token punctuation">,</span> SagaData<span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">NewCompensatingAction</span><span class="token punctuation">(</span>
+<span class="token punctuation">)</span> <span class="token operator">*</span>compensatingAction <span class="token punctuation">{</span>
+  task <span class="token operator">:=</span> <span class="token operator">&amp;</span>compensatingAction<span class="token punctuation">{</span>
+    Task<span class="token punctuation">:</span> sagas<span class="token punctuation">.</span>NewTask<span class="token punctuation">[</span>sagas<span class="token punctuation">.</span>EmptyArgs<span class="token punctuation">,</span> SagaData<span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+  <span class="token punctuation">}</span>
+  task<span class="token punctuation">.</span>OnSuccess <span class="token operator">=</span> sagas<span class="token punctuation">.</span>NewConnector<span class="token punctuation">[</span>sagas<span class="token punctuation">.</span>EmptyArgs<span class="token punctuation">,</span> SagaData<span class="token punctuation">]</span><span class="token punctuation">(</span>task<span class="token punctuation">)</span>
+
+  <span class="token keyword">return</span> task
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>i <span class="token operator">*</span>compensatingAction<span class="token punctuation">)</span> <span class="token function">Execute</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">)</span> sagas<span class="token punctuation">.</span>Decider<span class="token punctuation">[</span>sagas<span class="token punctuation">.</span>EmptyArgs<span class="token punctuation">,</span> SagaData<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token boolean">_</span> sagas<span class="token punctuation">.</span>EmptyArgs<span class="token punctuation">,</span> state <span class="token operator">*</span>saga<span class="token punctuation">.</span>State<span class="token punctuation">)</span> saga<span class="token punctuation">.</span>Decision<span class="token punctuation">[</span>SagaData<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+    err <span class="token operator">:=</span> <span class="token function">makeRemoteCall</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+      <span class="token keyword">if</span> errors<span class="token punctuation">.</span><span class="token function">Is</span><span class="token punctuation">(</span>err<span class="token punctuation">,</span> BadRequest<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">// something really unexpected happened, I have no idea what to do now!</span>
+        <span class="token keyword">return</span> sagas<span class="token punctuation">.</span>FailWithUnknownError<span class="token punctuation">[</span>SagaData<span class="token punctuation">]</span><span class="token punctuation">(</span>err<span class="token punctuation">.</span><span class="token function">Error</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+      <span class="token punctuation">}</span>
+      <span class="token comment">// this error is probably retriable</span>
+      <span class="token keyword">return</span> sagas<span class="token punctuation">.</span>Retry<span class="token punctuation">[</span>SagaData<span class="token punctuation">]</span><span class="token punctuation">(</span>err<span class="token punctuation">.</span><span class="token function">Error</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>    
+
+    <span class="token keyword">return</span> sagas<span class="token punctuation">.</span><span class="token function">Next</span><span class="token punctuation">(</span>i<span class="token punctuation">.</span>OnSuccess<span class="token punctuation">.</span><span class="token function">Resolve</span><span class="token punctuation">(</span>state<span class="token punctuation">)</span><span class="token punctuation">,</span> args<span class="token punctuation">.</span>Empty<span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<p>Notice that if for some reason the saga framework fails to persist the decision about where to go next this will also result in the call to Execute to be automatically retried. Therefore it is essential that the side effect carried out in the Execute method is idempotent.</p>
+<p>A task can mutate the saga data. In this example it could set the value of the <code>RememberThis</code> property and that value would be available to subsequent tasks. It is also possible to pass on arguments to tasks in the sagas.Next method. In this example the tasks did not declare any arguments so the special value <code>args.Empty</code> was used.</p>
+<h2 id="conclusion" tabindex="-1">Conclusion <a class="header-anchor" href="#conclusion">#</a></h2>
+<p>As this post hopefully demonstrates orchestration is a non trivial problem and many of the challenges that arise are of a generic nature. Moving away from a domain specific approach to using a generic library allowed us to save a lot of time and if you have to deal with a lot of orchestration it is something that I can definitely recommend.</p>
+
+<ul class="links-nextprev"><li>Previous: <a href="/dev-blog/blog/reducing_run/">How to run faster</a></li>
+</ul>
+
+		</main>
+
+		<footer></footer>
+
+		<!-- This page `/dev-blog/blog/sagas/` was built on 2024-10-04T05:37:28.709Z -->
+	</body>
+</html>

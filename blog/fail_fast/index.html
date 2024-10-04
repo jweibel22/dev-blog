@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Reduce time to recover and embrace failing</title>
+		<meta name="description" content="A collection of ideas on how to design your system in a way that reduces the operational burden">
+		<link rel="alternate" href="/dev-blog/feed/feed.xml" type="application/atom+xml" title="Developer Blog">
+		<link rel="alternate" href="/dev-blog/feed/feed.json" type="application/json" title="Developer Blog">
+		
+		<style>/**
+ * okaidia theme for JavaScript, CSS and HTML
+ * Loosely based on Monokai textmate theme by http://www.monokai.nl/
+ * @author ocodia
+ */
+
+code[class*="language-"],
+pre[class*="language-"] {
+	color: #f8f8f2;
+	background: none;
+	text-shadow: 0 1px rgba(0, 0, 0, 0.3);
+	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+	font-size: 1em;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+	word-wrap: normal;
+	line-height: 1.5;
+
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+	tab-size: 4;
+
+	-webkit-hyphens: none;
+	-moz-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+	padding: 1em;
+	margin: .5em 0;
+	overflow: auto;
+	border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+	background: #272822;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+	padding: .1em;
+	border-radius: .3em;
+	white-space: normal;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+	color: #8292a2;
+}
+
+.token.punctuation {
+	color: #f8f8f2;
+}
+
+.token.namespace {
+	opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.constant,
+.token.symbol,
+.token.deleted {
+	color: #f92672;
+}
+
+.token.boolean,
+.token.number {
+	color: #ae81ff;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+	color: #a6e22e;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string,
+.token.variable {
+	color: #f8f8f2;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.function,
+.token.class-name {
+	color: #e6db74;
+}
+
+.token.keyword {
+	color: #66d9ef;
+}
+
+.token.regex,
+.token.important {
+	color: #fd971f;
+}
+
+.token.important,
+.token.bold {
+	font-weight: bold;
+}
+.token.italic {
+	font-style: italic;
+}
+
+.token.entity {
+	cursor: help;
+}
+/*
+ * New diff- syntax
+ */
+
+pre[class*="language-diff-"] {
+	--eleventy-code-padding: 1.25em;
+	padding-left: var(--eleventy-code-padding);
+	padding-right: var(--eleventy-code-padding);
+}
+.token.deleted {
+	background-color: hsl(0, 51%, 37%);
+	color: inherit;
+}
+.token.inserted {
+	background-color: hsl(126, 31%, 39%);
+	color: inherit;
+}
+
+/* Make the + and - characters unselectable for copy/paste */
+.token.prefix.unchanged,
+.token.prefix.inserted,
+.token.prefix.deleted {
+	-webkit-user-select: none;
+	user-select: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+.token.prefix.inserted,
+.token.prefix.deleted {
+	width: var(--eleventy-code-padding);
+	background-color: rgba(0,0,0,.2);
+}
+
+/* Optional: full-width background color */
+.token.inserted:not(.prefix),
+.token.deleted:not(.prefix) {
+	display: block;
+	margin-left: calc(-1 * var(--eleventy-code-padding));
+	margin-right: calc(-1 * var(--eleventy-code-padding));
+	text-decoration: none; /* override del, ins, mark defaults */
+	color: inherit; /* override del, ins, mark defaults */
+}
+h1, h2, h3 {
+	color: #a07744;
+  }
+
+code {
+    color: #E69C19;
+    padding: 2px 4px;
+}
+* { box-sizing: border-box; }
+/* Defaults */
+:root {
+	--font-family: -apple-system, system-ui, sans-serif;
+	--font-family-monospace: Consolas, Menlo, Monaco, Andale Mono WT, Andale Mono, Lucida Console, Lucida Sans Typewriter, DejaVu Sans Mono, Bitstream Vera Sans Mono, Liberation Mono, Nimbus Mono L, Courier New, Courier, monospace;
+}
+
+/* Theme colors */
+:root {
+	--color-gray-20: #e0e0e0;
+	--color-gray-50: #C0C0C0;
+	--color-gray-90: #333;
+
+	--background-color: #fff;
+
+	--text-color: var(--color-gray-90);
+	--text-color-link: #082840;
+	--text-color-link-active: #5f2b48;
+	--text-color-link-visited: #17050F;
+
+	--syntax-tab-size: 2;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--color-gray-20: #e0e0e0;
+		--color-gray-50: #C0C0C0;
+		--color-gray-90: #dad8d8;
+
+		/* --text-color is assigned to --color-gray-_ above */
+		--text-color-link: #1493fb;
+		--text-color-link-active: #6969f7;
+		--text-color-link-visited: #a6a6f8;
+
+		--background-color: #15202b;
+	}
+}
+
+
+/* Global stylesheet */
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	padding: 0;
+	margin: 0 auto;
+	font-family: var(--font-family);
+	color: var(--text-color);
+	background-color: var(--background-color);
+}
+html {
+	overflow-y: scroll;
+}
+body {
+	max-width: 60em;
+}
+
+/* https://www.a11yproject.com/posts/how-to-hide-content/ */
+.visually-hidden {
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	height: 1px;
+	overflow: hidden;
+	position: absolute;
+	white-space: nowrap;
+	width: 1px;
+}
+
+p:last-child {
+	margin-bottom: 0;
+}
+p {
+	line-height: 1.5;
+}
+
+li {
+	line-height: 1.5;
+}
+
+a[href] {
+	color: var(--text-color-link);
+}
+a[href]:visited {
+	color: var(--text-color-link-visited);
+}
+a[href]:hover,
+a[href]:active {
+	color: var(--text-color-link-active);
+}
+
+main {
+	padding: 1rem;
+}
+main :first-child {
+	margin-top: 0;
+}
+
+header {
+	border-bottom: 1px dashed var(--color-gray-20);
+}
+header:after {
+	content: "";
+	display: table;
+	clear: both;
+}
+
+.links-nextprev {
+	list-style: none;
+	border-top: 1px dashed var(--color-gray-20);
+	padding: 1em 0;
+}
+
+table {
+	margin: 1em 0;
+}
+table td,
+table th {
+	padding-right: 1em;
+}
+
+pre,
+code {
+	font-family: var(--font-family-monospace);
+}
+pre:not([class*="language-"]) {
+	margin: .5em 0;
+	line-height: 1.375; /* 22px /16 */
+	-moz-tab-size: var(--syntax-tab-size);
+	-o-tab-size: var(--syntax-tab-size);
+	tab-size: var(--syntax-tab-size);
+	-webkit-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+	direction: ltr;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+}
+code {
+	word-break: break-all;
+}
+
+/* Header */
+header {
+	display: flex;
+	gap: 1em .5em;
+	flex-wrap: wrap;
+	align-items: center;
+	padding: 1em;
+}
+.home-link {
+	font-size: 1em; /* 16px /16 */
+	font-weight: 700;
+	margin-right: 2em;
+}
+.home-link:link:not(:hover) {
+	text-decoration: none;
+}
+
+/* Nav */
+.nav {
+	display: flex;
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+.nav-item {
+	display: inline-block;
+	margin-right: 1em;
+}
+.nav-item a[href]:not(:hover) {
+	text-decoration: none;
+}
+.nav a[href][aria-current="page"] {
+	text-decoration: underline;
+}
+
+/* Posts list */
+.postlist {
+	list-style: none;
+	padding: 0;
+	padding-left: 1.5rem;
+}
+.postlist-item {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	counter-increment: start-from -1;
+	margin-bottom: 1em;
+}
+.postlist-item:before {
+	display: inline-block;
+	pointer-events: none;
+	content: "" counter(start-from, decimal-leading-zero) ". ";
+	line-height: 100%;
+	text-align: right;
+	margin-left: -1.5rem;
+}
+.postlist-date,
+.postlist-item:before {
+	font-size: 0.8125em; /* 13px /16 */
+	color: var(--color-gray-90);
+}
+.postlist-date {
+	margin-bottom: 10px;
+	margin-top: 10px;
+	word-spacing: -0.5px;
+	flex-basis: calc(100% - 1.5rem);
+}
+.postlist-link {
+	font-size: 1.1875em; /* 19px /16 */
+	font-weight: 700;
+	flex-basis: calc(100% - 1.5rem);
+	padding-left: .25em;
+	padding-right: .5em;
+	text-underline-position: from-font;
+	text-underline-offset: 0;
+	text-decoration-thickness: 1px;
+}
+.postlist-item-active .postlist-link {
+	font-weight: bold;
+}
+
+/* Tags */
+.post-tag {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	text-transform: capitalize;
+	font-style: italic;
+}
+.postlist-item > .post-tag {
+	align-self: center;
+}
+
+/* Tags list */
+.post-metadata {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: .5em;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+.post-metadata time {
+	margin-right: 1em;
+}
+
+/* Direct Links / Markdown Headers */
+.header-anchor {
+	text-decoration: none;
+	font-style: normal;
+	font-size: 1em;
+	margin-left: .1em;
+}
+a[href].header-anchor,
+a[href].header-anchor:visited {
+	color: transparent;
+}
+a[href].header-anchor:focus,
+a[href].header-anchor:hover {
+	text-decoration: underline;
+}
+a[href].header-anchor:focus,
+:hover > a[href].header-anchor {
+	color: #aaa;
+}
+
+h2 + .header-anchor {
+	font-size: 1.5em;
+}</style>
+	</head>
+	<body>
+		<a href="#skip" class="visually-hidden">Skip to main content</a>
+
+		<header>
+			<a href="/dev-blog/" class="home-link">Developer Blog</a>
+			<nav>
+				<h2 class="visually-hidden">Top level navigation menu</h2>
+				<ul class="nav">
+					<li class="nav-item"><a href="/dev-blog/">Home</a></li>
+					<li class="nav-item"><a href="/dev-blog/blog/">Archive</a></li>
+					<li class="nav-item"><a href="/dev-blog/about/">About Me</a></li>
+				</ul>
+			</nav>
+		</header>
+
+		<main id="skip">
+			
+<h1>Reduce time to recover and embrace failing</h1>
+
+<ul class="post-metadata">
+	<li><time datetime="2024-07-04">04 July 2024</time></li>
+	<li><a href="/dev-blog/tags/developer-productivity/" class="post-tag">Developer productivity</a></li>
+</ul>
+
+<p>When your greenfield project finally hits production reality will bite you. Bugs will surface, edge cases you never thought about will emerge, the system will get into a bad state and you'll need to diagnose and correct the issues when they arise. This work, often referred to as &quot;run&quot; work, will be important and urgent and it will take up a lot of your time.</p>
+<p>Did you build your solution in a way that makes it easy to operate? If you didn't, this kind of work can take up much more of your time than it should, time that you could otherwise have spent on building new features and (hopefully) make an impact.</p>
+<h2 id="functional-requirements" tabindex="-1">Functional requirements <a class="header-anchor" href="#functional-requirements">#</a></h2>
+<p>Are you keeping a critical eye on the functional requirements? Are they reasonable and suitable for a first release of the product? Or are they just making the solution more difficult without much or any benefit?</p>
+<p></p><div style="background-color:#26394D; color: #c3c3c3; border-left: solid #37526F 4px; border-radius: 4px; padding:0.3em;">
+<span>
+<p style="margin-top:1em; text-align:center"><b></b></p>
+<div style="margin:2em"><p></p>
+<p>One of the initial requirements I was presented with during the early days of implementing a data platform was the need for having BI dashboards updated in real-time. It was important for the people to know the KPIs of the business and the fresher the data the better!</p>
+<p>At the time implementing support for real-time data transformations was much more challenging than supporting batch. In batch mode you could simply run the SQL transformations directly on the data warehouse at regular intervals, in real-time mode you would need to leverage technologies such as flink or spark streaming. The transformations were built by the users of the platform and could be of varying quality resulting in a heavy ops burden when the those transformations went rogue.</p>
+<p>After taking a critical look at the requirement for real-time updated dashboards it turned out that there were no real use cases requiring it. Data updated at hour intervals was good enough for all known use cases. Having dashboards updated in real-time was &quot;cool&quot; but at the end of the day there was no real need. Cutting away this requirement allowed for a much simpler initial solution and therefore also less potential run work.</p>
+<p></p></div>
+<p></p>
+</span>
+</div><p></p>
+<p>Perhaps there are some small alterations you can make to the functional requirements that will have little impact on the product but a huge impact on the complexity of the solution? A good example of this is the one given by Martin Kleppmann in &quot;Designing Data-Intensive Applications&quot;. In the example a booking system has relaxed the requirement of strong consistency and instead opted for eventual consistency. This means that two users could be booking the same tickets at the same time without knowing. The proposal is to allow for this to happen and then notify the users over email afterwards that their booking didn't go through after all. Depending on how likely such a scenario is to happen and how much negative impact it has on the users it can be a reasonable choice to make. Guaranteeing strong consistency in a distributed system is a hard problem after all.</p>
+<p></p><div style="background-color:#26394D; color: #c3c3c3; border-left: solid #37526F 4px; border-radius: 4px; padding:0.3em;">
+<span>
+<p style="margin-top:1em; text-align:center"><b></b></p>
+<div style="margin:2em"><p></p>
+<p>Once I was working in a company where the primary product was a mobile app. In one scenario, a user would input an &quot;order&quot; in the app which would trigger an orchestration process on the backend. While the backend process was running the user was presented with a &quot;spinner&quot; in the app. If the system was under heavy load some of the services involved in the orchestration process could take a long time to respond. This would mean that the user would be stuck with the spinner in the app not knowing what was going on. The solution was to not block the user for the duration of the orchestration process, but instead return immediately when the backend had received the order request from the user and show an &quot;in progress&quot; item in the app that would change state asynchronously when the backend process had ended.</p>
+<p>The initial design resulted in very bad user experience. It was also the cause of a lot of run due to users inputting duplicate orders, since users would eventually lose patience with the spinner, restart the app and redo their order not knowing the original order was still getting processed.</p>
+<p></p></div>
+<p></p>
+</span>
+</div><p></p>
+<p>Another simple trick is to prefer asynchronous over synchronous communication. Is there a user waiting at the other end? If not, perhaps you should consider async request/response and event driven communication instead of synchronous communication. When a distributed system built on synchronous communication comes under heavy load it becomes very unpredictable. As resources are running out (cpu, memory, disk, caches and internal buffers spilling over etc.) the various services will start failing, perhaps only partially, become unresponsive or just slow, and this can have a cascading effect throughout the distributed system. This could result in a lot of run work. A really good source of examples on this is in the excellent book <a href="https://www.amazon.com/Release-Production-Ready-Software-Pragmatic-Programmers/dp/0978739213">Release it</a> by Michael Nygaard.</p>
+<h2 id="non-functional-requirements" tabindex="-1">Non-functional requirements <a class="header-anchor" href="#non-functional-requirements">#</a></h2>
+<p>One obvious way to reduce run work is to be tolerant about failures/degradation. When considering the non-functional requirements during the development phase be critical/realistic about need-to-have and nice-to-have. Make strict alerting on the need-to-haves but be more relaxed about nice-to-have. Perhaps you could make use of SLIs and SLOs to keep track of the service levels in general and react to those rather than individual incidents.</p>
+<p></p><div style="background-color:#26394D; color: #c3c3c3; border-left: solid #37526F 4px; border-radius: 4px; padding:0.3em;">
+<span>
+<p style="margin-top:1em; text-align:center"><b></b></p>
+<div style="margin:2em"><p></p>
+<p>Some time ago I was working on an ingestion pipeline that had two separate parts. One part was responsible for ingesting the raw data into a datalake and the second part was responsible for applying a schema to the raw data and making it available for consumption in a data warehouse. If data was lost in the ingestion pipeline that ingested the raw data it was very hard or even impossible to replay the lost data from the source so it was absolutely critical to avoid data loss. In contrary, applying the schema to the raw data from the data lake was a repeatable process, if it failed it could be run again against the raw data from the datalake, and the consequence of any issues preventing the job from running would be delayed data delivery and not data loss. As a natural consequence of this difference we focused on making the ingestion of the raw data as robust as possible (implementing at-least-once delivery guarantee) and ensured that observability was in place even before going to production.</p>
+<p></p></div>
+<p></p>
+</span>
+</div><p></p>
+<h2 id="ops-driven-design" tabindex="-1">Ops driven design <a class="header-anchor" href="#ops-driven-design">#</a></h2>
+<p>Let's say you're building a backend. How do you recover when some bug occurs and you accidentally called a service with some wrong data, how do you compensate for the mistake? Does it require you to make code changes or is it possible to do the compensating action by running a script? How do you clean up any bad state in the system databases or external systems caused by the incident? Again, how long does the recovery take? And how much time will you as an engineer spend on this? See <a href="/dev-blog/blog/sagas/">sagas</a> for an example on how we reduced run work by introducing a saga framework that allowed us to make generic tooling that could be used to control the sagas in production.</p>
+<p>Let's say you're building a data pipeline. What happens if something unexpected happens and your pipeline stalls? After having fixed the issue can you resume from where it left off? Can you backfill data that was lost due to the incident? Can you backfill just the subset of the data you need or will you need to reprocess everything? How long will the recovery process take? If you have a plan, and the expected recovery time is reasonable, you can worry a little less about making mistakes and perhaps take mores risks. See <a href="/dev-blog/blog/data_platform/"> How to reach production in less than 6 months</a> on how I applied this principle on a data platform.</p>
+<p>Design decisions you make early on can have a huge impact on how easy the solution will be to operate once it gets into production, therefore as you design your solution you should think about this from day 1. An analogy to this is code testability. If code is not written with testability in mind adding unit tests later will often require refactoring the code. This is one of the arguments made by TDD. By writing tests in parallel with the implementation this won't happen and your code will be testable (and better designed).</p>
+<p>One way to achieve something akin to TDD could be to keep a staging environment running from the beginning of your development process and try to keep this environment in good state, i.e. if bad things happen you try to resolve any issues and recover the system in a similar way that you will do once you're in production. This way you'll find out if your design and the tooling you have in place is adequate to support the common run work that will occur. Obviously incidents that occur early on in the development process might not be representative to problems that you will see in the more mature system that reaches production so some level of pragmatism would be needed here. It would probably be a good idea to have a &quot;wipe&quot; tool that will restore the state of the system to a good state (perhaps just deleting all data) with a single touch of a magic wand.</p>
+<h2 id="alert-strategy" tabindex="-1">Alert strategy <a class="header-anchor" href="#alert-strategy">#</a></h2>
+<p>Think carefully about your alert strategy. A very common default approach is to set up generic alerts that simply alerts on all kinds of errors, however this can lead to excessive alerting, forcing engineers to waste time manually segregating critical from non-critical alerts. Not only does this lead to alert fatigue it is also a huge waste of time. Investments into optimising this can potentially have a large impact as the overhead of filtering through the alert storm quickly compounds over time.</p>
+<p>A good approach is to alert only on high severity or critical issues, i.e. issues that effect a large proportion of users or which could have fatal consequences if not dealt with immediately. These are the types of issues that demand the immediate attention of engineers and that you would want to be included in an on-call setup.  Everything else could be dealt with using a pull approach rather than a push approach. That way engineers can manage their own time better, do less context switching and be more efficient overall. You could set up a dashboard visualising the non-critical errors as they pile up in your backlog and regular check in on the dashboard to ensure issues are dealt with continuously. E.g. you could build a dashboard in grafana using panels that show up when issues arise:</p>
+<p><picture><source type="image/avif" srcset="/dev-blog/img/UUBKq8Cwa4-900.avif 900w"><source type="image/webp" srcset="/dev-blog/img/UUBKq8Cwa4-900.webp 900w"><img alt="" loading="lazy" decoding="async" src="/dev-blog/img/UUBKq8Cwa4-900.png" width="900" height="294"></picture></p>
+<h2 id="tooling" tabindex="-1">Tooling <a class="header-anchor" href="#tooling">#</a></h2>
+<p>Do you have the ops tools in place that you need to solve the problems you'll be facing? Obviously you'll need observability, but once you realise that there is a problem how easy is it to diagnose what happened and resolve the issue? Run work will happen, and if you're spending an unreasonable large amount of time logging into various systems, accessing databases, copy pasting data between systems etc. the overhead will compound over time.</p>
+<p>One thing you can do is make it easy to access the various sources of data you need to diagnose and resolve the issues. You could create a tool where you can access and correlate all the data and where all levers that can be pulled are also available. See <a href="/dev-blog/blog/reducing_run">Running fast</a> on ideas on how to make such tooling.</p>
+
+<ul class="links-nextprev"><li>Previous: <a href="/dev-blog/blog/terra_incognita/">Terra Incognita</a></li><li>Next: <a href="/dev-blog/blog/reducing_run/">How to run faster</a></li>
+</ul>
+
+		</main>
+
+		<footer></footer>
+
+		<!-- This page `/dev-blog/blog/fail_fast/` was built on 2024-10-04T05:37:28.710Z -->
+	</body>
+</html>
