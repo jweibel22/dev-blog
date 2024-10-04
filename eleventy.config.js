@@ -97,10 +97,10 @@ module.exports = function(eleventyConfig) {
 		return (new Date()).toISOString();
 	})
 
-	eleventyConfig.addPairedShortcode('note', (children) => `
+	eleventyConfig.addPairedShortcode('note', (children, title) => `
 	<div style='background-color:#26394D; color: #c3c3c3; border-left: solid #37526F 4px; border-radius: 4px; padding:0.3em;'>
 	<span>
-	<p style='margin-top:1em; text-align:center'><b>Real world example</b></p>
+	<p style='margin-top:1em; text-align:center'><b>${title}</b></p>
 	<div style='margin:2em'>
 	${children}
 	</div>

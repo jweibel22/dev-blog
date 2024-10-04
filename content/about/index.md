@@ -6,4 +6,4 @@ eleventyNavigation:
 ---
 # About Me
 
-I am a person that writes stuff.
+My [linkedIn profile](https://www.linkedin.com/in/jimmy-weibel-rasmussen-a968073/)
