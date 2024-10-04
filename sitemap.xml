@@ -17,6 +17,11 @@
 	</url>
 	
 	<url>
+		<loc>https://example.com/dev-blog/blog/data_platform/</loc>
+		<lastmod>2024-08-02</lastmod>
+	</url>
+	
+	<url>
 		<loc>https://example.com/dev-blog/blog/sagas/</loc>
 		<lastmod>2024-09-27</lastmod>
 	</url>
