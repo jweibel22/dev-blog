@@ -1,6 +1,6 @@
 ---
-title: Reasons to use a saga library
-description: This post advocates for using a library to build your sagas
+title: Orchestration is hard
+description: This post looks into the challenges of implementing orchestration
 date: 2024-09-27
 tags:
   - Microservices
@@ -12,23 +12,33 @@ When building a backend using the microservices architecture you'll most likely 
 
 In the definition of sagas used by [Chris Richardson]((https://microservices.io/patterns/data/saga.html)) (and others) sagas can either be orchestrated or choreographed. The implementation of a choreographed saga is distributed amongst the participating services, each service is subscribing to a set of events and will reactively execute side effects and possibly publish new events to the event bus that will move the process forward. This is an event driven approach that fosters a loose coupling between the services. Conversely an orchestrated saga is implemented by a single service that has the responsibility of keeping track of the state of the process, making calls to other services in a sequence of steps. This can result in a more tightly coupled architecture but the fact that the responsibility of the flow is anchored inside a single service makes it easier to debug and operate the sagas. Both approaches have their merits but this particular post is about orchestrating sagas.
 
-Sagas are often referred to as [process managers](https://learn.microsoft.com/en-us/previous-versions/msp-n-p/jj591569(v=pandp.10)?redirectedfrom=MSDN#what-is-a-process-manager) in the DDD community. Introducing a process manager into an architecture is a decision to model the process explicitly using the process manager rather than having the process modelled implicitly by having the aggregates communicate directly via commands and events. In the terminology of Chris Richardson you can therefore think of the process manager as an orchestrating saga.
-
 {% endnote %}
 
-## Sagas as first class citizens
+## Are sagas aggregates?
+
+In the DDD community, sagas, often referred to as `process managers`, are often depicted as aggregates. They are part of the domain model and are representing a business process from the domain and, at the same time, responsible for orchestration by calling other aggregates. In my opinion this approach is a violation of the single responsibility principle. There are two separate responsibilities, the responsibility of modelling the business process and the responsibility of carrying out the orchestration. The reason these two responsibilities are often not separated in the literature is because the complexity of carrying out the orchestration is ignored in the toy examples, but in reality, it is not just a matter of "calling another aggregate". In real life there will be many subtle and purely technical orchestration issues that will need to be dealt with and if the orchestration responsibility is anchored inside the domain this will bleed into the domain model. What happens when the call fails because the other aggregate threw an unexpected error or there was a disagreement over the contract, how do you get the saga to continue once the issue or bug is gone? What if you need to make a choice about which system needs to be called under different circumstances, does that decision belong inside the domain (notice the word "system" and not aggregate/domain)?
+
+In my experience, unless your orchestration duties are very simple, this violation of the single responsibility principle will make your life harder than it should be, and my advice is to move the orchestration responsibilities out of the domain into a saga that is a purely technical construct and only has the responsibility of carrying out the orchestration and ensuring distributed consistency. If the business process you're modelling is complex it can make sense to represent this as a first class citizen in your domain, but you can still do that while keeping the responsibility of executing the orchestration in a separate saga implementation.
+
+{% note 'Anecdote' %}
 
 I was once working on a project where our aggregates were modelled using event sourcing and sagas were implemented as any other aggregate. Often an aggregate representing a business entity would also act as a saga, taking responsibility of calling other aggregates. The remote calls were carried out by event handlers on the domain events of the saga and  when the remote call finished a new domain event was written to the event store causing the next event handler to be triggered. There were a few problems with this approach.
 
 First of all an orchestrating saga is essentially a DAG consisting of the set of tasks that needs to be taken and ideally the code should reflect this. However in the approach depicted above the DAG was essentially modelled using reactive code, each task being represented by an event handler, and progressing to the next step was done by writing an event which then reactively triggered the next task. This impedance mismatch, the misalignment between what is being modelled and how it is represented in the code made it hard to read. It was quite difficult to get a holistic overview of the DAG because it required jumping around the code base between different events and event handlers. One symptom of this was that the team were maintaining UML diagrams of all the sagas that were implemented. These diagrams were necessary to keep up to date to help the developers understand the workflow, because it was simply too difficult (time consuming) to obtain a mental image of the workflow by reading the code itself.
 
-Secondly since the business entity and the saga was modelled by the same object it became difficult to separate orchestration problems from business problems. E.g. some remote calls were async which meant that it was necessary to write two events related to the call to the event store. First an event representing the intention to make the call and the following representing the result of the call. Obviously this meant that if we needed to make changes to the orchestration for technical reasons, replacing an async API with a sync API, implementing the change would involving making changes to the event stream which was also used to represent the state of the business entity.
+Secondly since the business entity and the saga was modelled by the same object it became difficult to separate orchestration problems from business problems. E.g. some remote calls were async which meant that it was necessary to write two events related to the call to the event store. First an event representing the intention to make the call and the following representing the result of the call. I.e. we had domain events in our event store such as, AsyncCallToXStarted. Obviously this meant that if we needed to make changes to the orchestration for technical reasons, replacing an async API with a sync API, implementing the change would involving making changes to the event stream which was also used to represent the state of the business entity.
 
 Another problem was how to handle event replay. Replaying events is a common practice in event sourcing which allows e.g. to rebuild views that are based on the events from the event store, however since the saga actions were implemented as event handlers on those events this could result in unwanted side effects as already completed sagas would then start making remote calls.
 
 Lastly implementing orchestrating sagas is non trivial. It involves keeping track of the saga state, implementing retries and keeping track of stuck or failed sagas and we discovered that operating the sagas involved many commonalities. A saga could get stuck due to some remote system not responding or an expected event not arriving, they could end up in an unexpected situation from which they couldn't progress needing human assistance. We found ourselves implementing the same  patterns over and over again, e.g. implementing observability and endpoints that allowed us to resume a stuck saga.
 
-In the end we decided to model sagas explicitly and keep all orchestration responsibilities out of the business entities. Since modelling the sagas were now independent of the domain logic it allowed us to implement a library providing generic saga functionality that could be reused across domains. In the following sections I'll go through some of this common functionality.
+In the end we decided to model sagas explicitly and keep all orchestration responsibilities out of the business entities. Since modelling the sagas were now independent of the domain logic it allowed us to implement a library providing generic saga functionality that could be reused across domains.
+
+{% endnote %}
+
+## Orchestration is hard
+
+Orchestration is hard and many subtle issues can arise that will need you to do ops work. The issues are very much generic in nature, they are common issues related to technical problems that can arise when doing orchestration and trying to maintain consistency in a distributed system. For these reasons it is probably a good idea to use a saga library to model the sagas because the saga library can provide functionality to address the generic issues that you will need to deal with. In the following sections I'll go through some of the common issues. I'll be referring to a saga library that we built in go that contained common functionality to help address the common issues that we encountered.
 
 ### Observability
 
@@ -38,7 +48,7 @@ The saga library was built using an in-house event sourcing library, that choice
 
 ### Ops
 
-Many different types of orchestration related errors can happen in production. Some of them may cause a saga to become stuck or take wrong decisions and it must be possible to rectify these situations. E.g. a bug in the saga code, e.g. it was not able to recognize a valid response code from an API, could cause it to end up in `FailWithUnknownError`. In this case the corrective action would be to fix the bug in the saga code and move the saga back to the task that failed to execute. Of course the bug that caused the saga to misbehave could also originate from one of the remote systems that the saga interacts with. This could e.g. cause an API call to fail unexpectedly making the saga jump to the special `FailWithUnknownError` state. Again this must be fixed by fixing the bug in the remote system and move the saga back to the task that failed to execute.
+Many different types of orchestration related errors can happen in production. Some of them may cause a saga to become stuck or take wrong decisions and it must be possible to rectify these situations. A bug in the saga code, e.g. it was not able to recognize a response code from an API, could cause it to end up in `FailWithUnknownError`. In this case the corrective action would be to fix the bug in the saga code (add support for the unexpected response code) and move the saga back to the task that failed to execute. Of course the bug that caused the saga to misbehave could also originate from one of the remote systems that the saga interacts with. This could e.g. cause an API call to fail unexpectedly making the saga jump to the special `FailWithUnknownError` state. Again this must be fixed by fixing the bug in the remote system and move the saga back to the task that failed to execute.
 
 Much more complicated issues can arise. E.g. a bug can cause the saga to take wrong decisions and make incorrect remote calls, causing the distributed system to end up in an inconsistent state. In such situations it is often better to simply force complete the saga, and have a developer take over the responsibility for the state normally managed by the saga. If the APIs of the remote systems are available to be called manually the developer can make the corrective actions manually. The alternative, to enable the saga to get out of the situation by coding in the required flow will add complexity to the saga but since the situation was caused by a bug it is unlikely to ever end up in the same situation again so this part of the saga will not be useful later and only cause confusion to future developers who may not be familiar with the particular incident and understand why that particular behaviour is implemented.
 
@@ -65,7 +75,7 @@ Sometimes our sagas needed to wait for a period of time before continuing. This 
 
 ## The code
 
-This post is not really a presentation of the specific library, but for completeness I'll show some examples.
+This post is not really a presentation of a specific library, but for completeness I'll show some examples from the go library that we built.
 
 In the below example we're constructing a saga that will carry out some action (e.g. call some remote system) and if it fails it will carry out some compensating action. The example is a bit contrived, normally you wouldn't need to carry out a compensating action unless some previous actions actually succeeded, however to keep the example code short we skipped that part. The `done` task is a task provided by the saga library that will simply complete the saga.
 
