@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Cursor AI</title>
+		<meta name="description" content="A look at cursor AI">
+		<link rel="alternate" href="/dev-blog/feed/feed.xml" type="application/atom+xml" title="Developer Blog">
+		<link rel="alternate" href="/dev-blog/feed/feed.json" type="application/json" title="Developer Blog">
+		
+		<style>/**
+ * okaidia theme for JavaScript, CSS and HTML
+ * Loosely based on Monokai textmate theme by http://www.monokai.nl/
+ * @author ocodia
+ */
+
+code[class*="language-"],
+pre[class*="language-"] {
+	color: #f8f8f2;
+	background: none;
+	text-shadow: 0 1px rgba(0, 0, 0, 0.3);
+	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+	font-size: 1em;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+	word-wrap: normal;
+	line-height: 1.5;
+
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+	tab-size: 4;
+
+	-webkit-hyphens: none;
+	-moz-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+	padding: 1em;
+	margin: .5em 0;
+	overflow: auto;
+	border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+	background: #272822;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+	padding: .1em;
+	border-radius: .3em;
+	white-space: normal;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+	color: #8292a2;
+}
+
+.token.punctuation {
+	color: #f8f8f2;
+}
+
+.token.namespace {
+	opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.constant,
+.token.symbol,
+.token.deleted {
+	color: #f92672;
+}
+
+.token.boolean,
+.token.number {
+	color: #ae81ff;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+	color: #a6e22e;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string,
+.token.variable {
+	color: #f8f8f2;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.function,
+.token.class-name {
+	color: #e6db74;
+}
+
+.token.keyword {
+	color: #66d9ef;
+}
+
+.token.regex,
+.token.important {
+	color: #fd971f;
+}
+
+.token.important,
+.token.bold {
+	font-weight: bold;
+}
+.token.italic {
+	font-style: italic;
+}
+
+.token.entity {
+	cursor: help;
+}
+/*
+ * New diff- syntax
+ */
+
+pre[class*="language-diff-"] {
+	--eleventy-code-padding: 1.25em;
+	padding-left: var(--eleventy-code-padding);
+	padding-right: var(--eleventy-code-padding);
+}
+.token.deleted {
+	background-color: hsl(0, 51%, 37%);
+	color: inherit;
+}
+.token.inserted {
+	background-color: hsl(126, 31%, 39%);
+	color: inherit;
+}
+
+/* Make the + and - characters unselectable for copy/paste */
+.token.prefix.unchanged,
+.token.prefix.inserted,
+.token.prefix.deleted {
+	-webkit-user-select: none;
+	user-select: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+.token.prefix.inserted,
+.token.prefix.deleted {
+	width: var(--eleventy-code-padding);
+	background-color: rgba(0,0,0,.2);
+}
+
+/* Optional: full-width background color */
+.token.inserted:not(.prefix),
+.token.deleted:not(.prefix) {
+	display: block;
+	margin-left: calc(-1 * var(--eleventy-code-padding));
+	margin-right: calc(-1 * var(--eleventy-code-padding));
+	text-decoration: none; /* override del, ins, mark defaults */
+	color: inherit; /* override del, ins, mark defaults */
+}
+h1, h2, h3 {
+	color: #a07744;
+  }
+
+code {
+    color: #E69C19;
+    padding: 2px 4px;
+}
+* { box-sizing: border-box; }
+/* Defaults */
+:root {
+	--font-family: -apple-system, system-ui, sans-serif;
+	--font-family-monospace: Consolas, Menlo, Monaco, Andale Mono WT, Andale Mono, Lucida Console, Lucida Sans Typewriter, DejaVu Sans Mono, Bitstream Vera Sans Mono, Liberation Mono, Nimbus Mono L, Courier New, Courier, monospace;
+}
+
+/* Theme colors */
+:root {
+	--color-gray-20: #e0e0e0;
+	--color-gray-50: #C0C0C0;
+	--color-gray-90: #333;
+
+	--background-color: #fff;
+
+	--text-color: var(--color-gray-90);
+	--text-color-link: #082840;
+	--text-color-link-active: #5f2b48;
+	--text-color-link-visited: #17050F;
+
+	--syntax-tab-size: 2;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--color-gray-20: #e0e0e0;
+		--color-gray-50: #C0C0C0;
+		--color-gray-90: #dad8d8;
+
+		/* --text-color is assigned to --color-gray-_ above */
+		--text-color-link: #1493fb;
+		--text-color-link-active: #6969f7;
+		--text-color-link-visited: #a6a6f8;
+
+		--background-color: #15202b;
+	}
+}
+
+
+/* Global stylesheet */
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	padding: 0;
+	margin: 0 auto;
+	font-family: var(--font-family);
+	color: var(--text-color);
+	background-color: var(--background-color);
+}
+html {
+	overflow-y: scroll;
+}
+body {
+	max-width: 60em;
+}
+
+/* https://www.a11yproject.com/posts/how-to-hide-content/ */
+.visually-hidden {
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	height: 1px;
+	overflow: hidden;
+	position: absolute;
+	white-space: nowrap;
+	width: 1px;
+}
+
+p:last-child {
+	margin-bottom: 0;
+}
+p {
+	line-height: 1.5;
+}
+
+li {
+	line-height: 1.5;
+}
+
+a[href] {
+	color: var(--text-color-link);
+}
+a[href]:visited {
+	color: var(--text-color-link-visited);
+}
+a[href]:hover,
+a[href]:active {
+	color: var(--text-color-link-active);
+}
+
+main {
+	padding: 1rem;
+}
+main :first-child {
+	margin-top: 0;
+}
+
+header {
+	border-bottom: 1px dashed var(--color-gray-20);
+}
+header:after {
+	content: "";
+	display: table;
+	clear: both;
+}
+
+.links-nextprev {
+	list-style: none;
+	border-top: 1px dashed var(--color-gray-20);
+	padding: 1em 0;
+}
+
+table {
+	margin: 1em 0;
+}
+table td,
+table th {
+	padding-right: 1em;
+}
+
+pre,
+code {
+	font-family: var(--font-family-monospace);
+}
+pre:not([class*="language-"]) {
+	margin: .5em 0;
+	line-height: 1.375; /* 22px /16 */
+	-moz-tab-size: var(--syntax-tab-size);
+	-o-tab-size: var(--syntax-tab-size);
+	tab-size: var(--syntax-tab-size);
+	-webkit-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+	direction: ltr;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+}
+code {
+	word-break: break-all;
+}
+
+/* Header */
+header {
+	display: flex;
+	gap: 1em .5em;
+	flex-wrap: wrap;
+	align-items: center;
+	padding: 1em;
+}
+.home-link {
+	font-size: 1em; /* 16px /16 */
+	font-weight: 700;
+	margin-right: 2em;
+}
+.home-link:link:not(:hover) {
+	text-decoration: none;
+}
+
+/* Nav */
+.nav {
+	display: flex;
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+.nav-item {
+	display: inline-block;
+	margin-right: 1em;
+}
+.nav-item a[href]:not(:hover) {
+	text-decoration: none;
+}
+.nav a[href][aria-current="page"] {
+	text-decoration: underline;
+}
+
+/* Posts list */
+.postlist {
+	list-style: none;
+	padding: 0;
+	padding-left: 1.5rem;
+}
+.postlist-item {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	counter-increment: start-from -1;
+	margin-bottom: 1em;
+}
+.postlist-item:before {
+	display: inline-block;
+	pointer-events: none;
+	content: "" counter(start-from, decimal-leading-zero) ". ";
+	line-height: 100%;
+	text-align: right;
+	margin-left: -1.5rem;
+}
+.postlist-date,
+.postlist-item:before {
+	font-size: 0.8125em; /* 13px /16 */
+	color: var(--color-gray-90);
+}
+.postlist-date {
+	margin-bottom: 10px;
+	margin-top: 10px;
+	word-spacing: -0.5px;
+	flex-basis: calc(100% - 1.5rem);
+}
+.postlist-link {
+	font-size: 1.1875em; /* 19px /16 */
+	font-weight: 700;
+	flex-basis: calc(100% - 1.5rem);
+	padding-left: .25em;
+	padding-right: .5em;
+	text-underline-position: from-font;
+	text-underline-offset: 0;
+	text-decoration-thickness: 1px;
+}
+.postlist-item-active .postlist-link {
+	font-weight: bold;
+}
+
+/* Tags */
+.post-tag {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	text-transform: capitalize;
+	font-style: italic;
+}
+.postlist-item > .post-tag {
+	align-self: center;
+}
+
+/* Tags list */
+.post-metadata {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: .5em;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+.post-metadata time {
+	margin-right: 1em;
+}
+
+/* Direct Links / Markdown Headers */
+.header-anchor {
+	text-decoration: none;
+	font-style: normal;
+	font-size: 1em;
+	margin-left: .1em;
+}
+a[href].header-anchor,
+a[href].header-anchor:visited {
+	color: transparent;
+}
+a[href].header-anchor:focus,
+a[href].header-anchor:hover {
+	text-decoration: underline;
+}
+a[href].header-anchor:focus,
+:hover > a[href].header-anchor {
+	color: #aaa;
+}
+
+h2 + .header-anchor {
+	font-size: 1.5em;
+}</style>
+	</head>
+	<body>
+		<a href="#skip" class="visually-hidden">Skip to main content</a>
+
+		<header>
+			<a href="/dev-blog/" class="home-link">Developer Blog</a>
+			<nav>
+				<h2 class="visually-hidden">Top level navigation menu</h2>
+				<ul class="nav">
+					<li class="nav-item"><a href="/dev-blog/">Home</a></li>
+					<li class="nav-item"><a href="/dev-blog/blog/">Archive</a></li>
+					<li class="nav-item"><a href="/dev-blog/about/">About Me</a></li>
+				</ul>
+			</nav>
+		</header>
+
+		<main id="skip">
+			
+<h1>Cursor AI</h1>
+
+<ul class="post-metadata">
+	<li><time datetime="2025-02-09">09 February 2025</time></li>
+	<li><a href="/dev-blog/tags/ai/" class="post-tag">AI</a>, </li>
+	<li><a href="/dev-blog/tags/developer-productivity/" class="post-tag">Developer productivity</a></li>
+</ul>
+
+<p><a href="https://www.cursor.com/">Cursor AI</a> is an IDE, a fork of visual studio, that includes powerful AI features. With Cursor AI you can ask the AI to generate code changes directly in the source files and this is the key feature that has been missing with all previous AI copilots.</p>
+<p>I gave it a try.</p>
+<p>I decided to build a React website from scratch, including user login, editing of profile information, search capabilities etc. with the help of cursor AI. I have limited experience with React, so being slightly out of my comfort zone made it a perfect fit to try out the AI capabilities. Also, since building a React website involves building many standard components that has been widely documented and discussed on the internet for many years this is something an AI is expected to be very good at.</p>
+<h2 id="verdict" tabindex="-1">Verdict <a class="header-anchor" href="#verdict">#</a></h2>
+<ul>
+<li>It is really fast to get going and have something up and running fast, however things quickly get more difficult as the code base evolves, handling the context becomes harder and keeping a consistent code style is challenging. E.g. composer seem to know about a lot of the code base even if files are not added explicitly to the context, but what are the exact rules?</li>
+<li>Most of the time understands the questions and generates code that does the right thing.</li>
+<li>Really good at generating mock data.</li>
+<li>Besides making changes directly in the code it can also make instructions about terminal commands that must be executed, e.g. to install needed dependencies, and the commands can be run by the click of a button!</li>
+<li>Auto-complete is really spot on.</li>
+<li>Insufficient understanding of how different versions of libraries relate to each other and handling breaking changes. What code works with which versions of a library, it sometimes generates code that doesn't work with the version of dependencies I had installed.</li>
+<li>Is not up to date with the latest versions of all libraries, it made false claims about &quot;latest version of this library is x.x.x&quot;.</li>
+</ul>
+<h2 id="from-zero-to-a-hundred" tabindex="-1">From zero to a hundred <a class="header-anchor" href="#from-zero-to-a-hundred">#</a></h2>
+<p>From a clean slate I asked it to generate new React app for me to get going. It generated everything for me and gave me instructions on how to spin it up locally and everything worked! I later realised that the create-react-app command that it had used to generate the app was actually deprecated and no longer recommended by the authors.</p>
+<p>Going from there the workflow was to ask the composer to make an addition, inspect the proposed changes, correct any misunderstandings about what I had wanted it to do, that happened very rarely though, apply the changes to the code base and then make any corrections that I saw fit and finally making a git commit. Rinse and repeat.</p>
+<p>Before Cursor AI each iteration in the workflow would have consisted of an investigation phase prior to the implementation phase, but with cursor AI I would ask it to suggest the changes and I would then only investigate if the ambiguity of the solution was high. This made me much more efficient and able to stay in the flow. Seeing code generated in small iterations is also a very efficient way to learn.</p>
+<h2 id="caveats" tabindex="-1">Caveats <a class="header-anchor" href="#caveats">#</a></h2>
+<p><em>Some of the following caveats could probably be circumvented by doing better prompting, e.g. with a more customised pre instruction and doing better management of the context in the chat and composer, i.e. ensuring that all relevant files have been shared at before asking a question.</em></p>
+<h3 id="no-free-lunch" tabindex="-1">No free lunch <a class="header-anchor" href="#no-free-lunch">#</a></h3>
+<p>Sometimes it makes mistakes and you'll need to figure out why something isn't working.
+It can often help you out if you put in the error message in the chat, but sometimes you need to debug and understand the problem yourself.
+This is what you normally do anyway, but due to the limitations of the AI it can sometimes get you into some weird situations that you would end up in if you had done it yourself. In other words, you'll need to understand what's going on in the code and have or gain a basic understanding of the language, frameworks/libraries you're working with. This is really not a problem and the AI can help you and guide you along the way to gain that understanding, but just to say that this is not a magic bullet that will make any junior developer be able produce quality code from day 1.</p>
+<h3 id="the-ai-is-not-a-senior-at-your-company" tabindex="-1">The AI is not a senior at your company <a class="header-anchor" href="#the-ai-is-not-a-senior-at-your-company">#</a></h3>
+<p>The AI will generate code for you, but it doesn't have the big overview or vision of where you're going, it might be a senior engineer, but it doesn't know everything about you, your company and it hasn't seen all of your code and participated in the discussions about idioms and best practices that you and your fellow engineers have had. Supplying all of that to the AI so that it can guide you in all decision making might not be worth the effort?</p>
+<p>The AI was not aware of the larger design and style of the existing code base, e.g. in which files would it be appropriate to put the generated code. It would even be inconsistent in the code it is generating itself. Initially it would put all <code>fetch</code> calls into a separate js file to separate that code from the react components/pages but later it would start putting fetch calls directly in there.</p>
+<p>It also doesn't necessarily consider all possible ways of solving a task so it might not solve a problem in the most effective or appropriate way
+in the given situation. E.g. if you want to do proximity search and are just toying with a tiny project perhaps it is not necessary to use a db that supports proximity search. You'll need to know which design decisions are the right for you in the given situation and then ask the AI to help you with the boring work.</p>
+<h3 id="context-management-is-an-unresolved-issue" tabindex="-1">Context management is an unresolved issue <a class="header-anchor" href="#context-management-is-an-unresolved-issue">#</a></h3>
+<p>Like with other AI copilots dealing with the context is still a pita. It forgot that I was using sqlite and generated code that works for mysql. At some point it generated code in a new file which is already there in an existing file (setting up the database). It was of course my own mistake as I had not shared all the relevant files in the context, but I was in general struggling a bit remembering to keep the context up to date at all time, and it caused some confusion.</p>
+<p>Although it was fairly manageable on this small toy project dealing with the limitation of the context window on real world projects, which has 100+ files, is a major issue. Until the AI copilots become better at managing the context, e.g. automatically discovering relevant files and adding them to the conversation, the applicability of the AI copilots will be very limited in a professional setting.</p>
+<h2 id="man-vs-machine" tabindex="-1">Man vs machine <a class="header-anchor" href="#man-vs-machine">#</a></h2>
+<p>The AI tools keep getting better and better, so what's left for us to do? Are we just going to be gathering and understanding requirements and feeding those into an AI agent that will take care of everything from there?</p>
+<p>I don't think so.</p>
+<p>At the end of the day when shit hits the fan an engineer must be able to debug the system, and not being familiar with the code base, even with all the AI help you can think of, would make debugging it extremely difficult. Therefore, I think we'll continue to see AI as just another tool in the toolbox, irrespective of how good it is going to get.</p>
+<p>So what's the learning experience going to be like for a junior in the future when you can simply generate working code?
+As an engineer you'll be expected to deliver fast and reading though code that is working or reading up on related documentation is an investment in personal growth but not necessarily productive. So what would incentivise an engineer to do this?</p>
+<p>The reason the tool is useful to me as an engineer is because I'm able to be critical of the generated code and make adjustments that I see fit, but the reason I can do that is because I've been coding, without the help of an omnipresent AI copilot, for decades.</p>
+<p>Perhaps in the future software engineers will mostly do research projects, where a new tool or way of doing things is investigated and POC'ed and if deemed successful the learnings will get fed into the AI ecosystem and enter the development space that way?</p>
+<p>Hopefully we will find a way for man and machine to live in harmony.</p>
+
+<ul class="links-nextprev"><li>Previous: <a href="/dev-blog/blog/sagas/">Orchestration is hard</a></li>
+</ul>
+
+		</main>
+
+		<footer></footer>
+
+		<!-- This page `/dev-blog/blog/cursor/` was built on 2025-02-09T08:58:24.762Z -->
+	</body>
+</html>

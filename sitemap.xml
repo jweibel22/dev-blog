@@ -27,42 +27,52 @@
 	</url>
 	
 	<url>
+		<loc>https://example.com/dev-blog/blog/cursor/</loc>
+		<lastmod>2025-02-09</lastmod>
+	</url>
+	
+	<url>
 		<loc>https://example.com/dev-blog/about/</loc>
-		<lastmod>2024-10-12</lastmod>
+		<lastmod>2025-02-09</lastmod>
 	</url>
 	
 	<url>
 		<loc>https://example.com/dev-blog/blog/</loc>
-		<lastmod>2024-10-12</lastmod>
+		<lastmod>2025-02-09</lastmod>
 	</url>
 	
 	<url>
 		<loc>https://example.com/dev-blog/</loc>
-		<lastmod>2024-10-12</lastmod>
+		<lastmod>2025-02-09</lastmod>
 	</url>
 	
 	<url>
 		<loc>https://example.com/dev-blog/tags/</loc>
-		<lastmod>2024-10-12</lastmod>
+		<lastmod>2025-02-09</lastmod>
 	</url>
 	
 	<url>
-		<loc>https://example.com/dev-blog/tags/data/</loc>
-		<lastmod>2024-10-12</lastmod>
+		<loc>https://example.com/dev-blog/tags/ai/</loc>
+		<lastmod>2025-02-09</lastmod>
 	</url>
 	
 	<url>
 		<loc>https://example.com/dev-blog/tags/developer-productivity/</loc>
-		<lastmod>2024-10-12</lastmod>
+		<lastmod>2025-02-09</lastmod>
 	</url>
 	
 	<url>
 		<loc>https://example.com/dev-blog/tags/microservices/</loc>
-		<lastmod>2024-10-12</lastmod>
+		<lastmod>2025-02-09</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://example.com/dev-blog/tags/data/</loc>
+		<lastmod>2025-02-09</lastmod>
 	</url>
 	
 	<url>
 		<loc>https://example.com/dev-blog/tags/domain-driven-design/</loc>
-		<lastmod>2024-10-12</lastmod>
+		<lastmod>2025-02-09</lastmod>
 	</url>
 </urlset>
