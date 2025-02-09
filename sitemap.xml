@@ -2,8 +2,18 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 	
 	<url>
-		<loc>https://example.com/dev-blog/blog/terra_incognita/</loc>
-		<lastmod>2024-06-21</lastmod>
+		<loc>https://example.com/dev-blog/blog/ddd/</loc>
+		<lastmod>2024-06-22</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://example.com/dev-blog/blog/responsibility_boundaries/</loc>
+		<lastmod>2024-06-23</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://example.com/dev-blog/blog/agility/</loc>
+		<lastmod>2024-06-24</lastmod>
 	</url>
 	
 	<url>
@@ -52,12 +62,7 @@
 	</url>
 	
 	<url>
-		<loc>https://example.com/dev-blog/tags/ai/</loc>
-		<lastmod>2025-02-09</lastmod>
-	</url>
-	
-	<url>
-		<loc>https://example.com/dev-blog/tags/developer-productivity/</loc>
+		<loc>https://example.com/dev-blog/tags/domain-driven-design/</loc>
 		<lastmod>2025-02-09</lastmod>
 	</url>
 	
@@ -72,7 +77,12 @@
 	</url>
 	
 	<url>
-		<loc>https://example.com/dev-blog/tags/domain-driven-design/</loc>
+		<loc>https://example.com/dev-blog/tags/developer-productivity/</loc>
+		<lastmod>2025-02-09</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://example.com/dev-blog/tags/ai/</loc>
 		<lastmod>2025-02-09</lastmod>
 	</url>
 </urlset>

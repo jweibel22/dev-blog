@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Agility</title>
+		<meta name="description" content="Building maintainable microservices - part 3">
+		<link rel="alternate" href="/dev-blog/feed/feed.xml" type="application/atom+xml" title="Developer Blog">
+		<link rel="alternate" href="/dev-blog/feed/feed.json" type="application/json" title="Developer Blog">
+		
+		<style>/**
+ * okaidia theme for JavaScript, CSS and HTML
+ * Loosely based on Monokai textmate theme by http://www.monokai.nl/
+ * @author ocodia
+ */
+
+code[class*="language-"],
+pre[class*="language-"] {
+	color: #f8f8f2;
+	background: none;
+	text-shadow: 0 1px rgba(0, 0, 0, 0.3);
+	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+	font-size: 1em;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+	word-wrap: normal;
+	line-height: 1.5;
+
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+	tab-size: 4;
+
+	-webkit-hyphens: none;
+	-moz-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+	padding: 1em;
+	margin: .5em 0;
+	overflow: auto;
+	border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+	background: #272822;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+	padding: .1em;
+	border-radius: .3em;
+	white-space: normal;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+	color: #8292a2;
+}
+
+.token.punctuation {
+	color: #f8f8f2;
+}
+
+.token.namespace {
+	opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.constant,
+.token.symbol,
+.token.deleted {
+	color: #f92672;
+}
+
+.token.boolean,
+.token.number {
+	color: #ae81ff;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+	color: #a6e22e;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string,
+.token.variable {
+	color: #f8f8f2;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.function,
+.token.class-name {
+	color: #e6db74;
+}
+
+.token.keyword {
+	color: #66d9ef;
+}
+
+.token.regex,
+.token.important {
+	color: #fd971f;
+}
+
+.token.important,
+.token.bold {
+	font-weight: bold;
+}
+.token.italic {
+	font-style: italic;
+}
+
+.token.entity {
+	cursor: help;
+}
+/*
+ * New diff- syntax
+ */
+
+pre[class*="language-diff-"] {
+	--eleventy-code-padding: 1.25em;
+	padding-left: var(--eleventy-code-padding);
+	padding-right: var(--eleventy-code-padding);
+}
+.token.deleted {
+	background-color: hsl(0, 51%, 37%);
+	color: inherit;
+}
+.token.inserted {
+	background-color: hsl(126, 31%, 39%);
+	color: inherit;
+}
+
+/* Make the + and - characters unselectable for copy/paste */
+.token.prefix.unchanged,
+.token.prefix.inserted,
+.token.prefix.deleted {
+	-webkit-user-select: none;
+	user-select: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+.token.prefix.inserted,
+.token.prefix.deleted {
+	width: var(--eleventy-code-padding);
+	background-color: rgba(0,0,0,.2);
+}
+
+/* Optional: full-width background color */
+.token.inserted:not(.prefix),
+.token.deleted:not(.prefix) {
+	display: block;
+	margin-left: calc(-1 * var(--eleventy-code-padding));
+	margin-right: calc(-1 * var(--eleventy-code-padding));
+	text-decoration: none; /* override del, ins, mark defaults */
+	color: inherit; /* override del, ins, mark defaults */
+}
+h1, h2, h3 {
+	color: #a07744;
+  }
+
+code {
+    color: #E69C19;
+    padding: 2px 4px;
+}
+* { box-sizing: border-box; }
+/* Defaults */
+:root {
+	--font-family: -apple-system, system-ui, sans-serif;
+	--font-family-monospace: Consolas, Menlo, Monaco, Andale Mono WT, Andale Mono, Lucida Console, Lucida Sans Typewriter, DejaVu Sans Mono, Bitstream Vera Sans Mono, Liberation Mono, Nimbus Mono L, Courier New, Courier, monospace;
+}
+
+/* Theme colors */
+:root {
+	--color-gray-20: #e0e0e0;
+	--color-gray-50: #C0C0C0;
+	--color-gray-90: #333;
+
+	--background-color: #fff;
+
+	--text-color: var(--color-gray-90);
+	--text-color-link: #082840;
+	--text-color-link-active: #5f2b48;
+	--text-color-link-visited: #17050F;
+
+	--syntax-tab-size: 2;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--color-gray-20: #e0e0e0;
+		--color-gray-50: #C0C0C0;
+		--color-gray-90: #dad8d8;
+
+		/* --text-color is assigned to --color-gray-_ above */
+		--text-color-link: #1493fb;
+		--text-color-link-active: #6969f7;
+		--text-color-link-visited: #a6a6f8;
+
+		--background-color: #15202b;
+	}
+}
+
+
+/* Global stylesheet */
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	padding: 0;
+	margin: 0 auto;
+	font-family: var(--font-family);
+	color: var(--text-color);
+	background-color: var(--background-color);
+}
+html {
+	overflow-y: scroll;
+}
+body {
+	max-width: 60em;
+}
+
+/* https://www.a11yproject.com/posts/how-to-hide-content/ */
+.visually-hidden {
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	height: 1px;
+	overflow: hidden;
+	position: absolute;
+	white-space: nowrap;
+	width: 1px;
+}
+
+p:last-child {
+	margin-bottom: 0;
+}
+p {
+	line-height: 1.5;
+}
+
+li {
+	line-height: 1.5;
+}
+
+a[href] {
+	color: var(--text-color-link);
+}
+a[href]:visited {
+	color: var(--text-color-link-visited);
+}
+a[href]:hover,
+a[href]:active {
+	color: var(--text-color-link-active);
+}
+
+main {
+	padding: 1rem;
+}
+main :first-child {
+	margin-top: 0;
+}
+
+header {
+	border-bottom: 1px dashed var(--color-gray-20);
+}
+header:after {
+	content: "";
+	display: table;
+	clear: both;
+}
+
+.links-nextprev {
+	list-style: none;
+	border-top: 1px dashed var(--color-gray-20);
+	padding: 1em 0;
+}
+
+table {
+	margin: 1em 0;
+}
+table td,
+table th {
+	padding-right: 1em;
+}
+
+pre,
+code {
+	font-family: var(--font-family-monospace);
+}
+pre:not([class*="language-"]) {
+	margin: .5em 0;
+	line-height: 1.375; /* 22px /16 */
+	-moz-tab-size: var(--syntax-tab-size);
+	-o-tab-size: var(--syntax-tab-size);
+	tab-size: var(--syntax-tab-size);
+	-webkit-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+	direction: ltr;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+}
+code {
+	word-break: break-all;
+}
+
+/* Header */
+header {
+	display: flex;
+	gap: 1em .5em;
+	flex-wrap: wrap;
+	align-items: center;
+	padding: 1em;
+}
+.home-link {
+	font-size: 1em; /* 16px /16 */
+	font-weight: 700;
+	margin-right: 2em;
+}
+.home-link:link:not(:hover) {
+	text-decoration: none;
+}
+
+/* Nav */
+.nav {
+	display: flex;
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+.nav-item {
+	display: inline-block;
+	margin-right: 1em;
+}
+.nav-item a[href]:not(:hover) {
+	text-decoration: none;
+}
+.nav a[href][aria-current="page"] {
+	text-decoration: underline;
+}
+
+/* Posts list */
+.postlist {
+	list-style: none;
+	padding: 0;
+	padding-left: 1.5rem;
+}
+.postlist-item {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	counter-increment: start-from -1;
+	margin-bottom: 1em;
+}
+.postlist-item:before {
+	display: inline-block;
+	pointer-events: none;
+	content: "" counter(start-from, decimal-leading-zero) ". ";
+	line-height: 100%;
+	text-align: right;
+	margin-left: -1.5rem;
+}
+.postlist-date,
+.postlist-item:before {
+	font-size: 0.8125em; /* 13px /16 */
+	color: var(--color-gray-90);
+}
+.postlist-date {
+	margin-bottom: 10px;
+	margin-top: 10px;
+	word-spacing: -0.5px;
+	flex-basis: calc(100% - 1.5rem);
+}
+.postlist-link {
+	font-size: 1.1875em; /* 19px /16 */
+	font-weight: 700;
+	flex-basis: calc(100% - 1.5rem);
+	padding-left: .25em;
+	padding-right: .5em;
+	text-underline-position: from-font;
+	text-underline-offset: 0;
+	text-decoration-thickness: 1px;
+}
+.postlist-item-active .postlist-link {
+	font-weight: bold;
+}
+
+/* Tags */
+.post-tag {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	text-transform: capitalize;
+	font-style: italic;
+}
+.postlist-item > .post-tag {
+	align-self: center;
+}
+
+/* Tags list */
+.post-metadata {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: .5em;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+.post-metadata time {
+	margin-right: 1em;
+}
+
+/* Direct Links / Markdown Headers */
+.header-anchor {
+	text-decoration: none;
+	font-style: normal;
+	font-size: 1em;
+	margin-left: .1em;
+}
+a[href].header-anchor,
+a[href].header-anchor:visited {
+	color: transparent;
+}
+a[href].header-anchor:focus,
+a[href].header-anchor:hover {
+	text-decoration: underline;
+}
+a[href].header-anchor:focus,
+:hover > a[href].header-anchor {
+	color: #aaa;
+}
+
+h2 + .header-anchor {
+	font-size: 1.5em;
+}</style>
+	</head>
+	<body>
+		<a href="#skip" class="visually-hidden">Skip to main content</a>
+
+		<header>
+			<a href="/dev-blog/" class="home-link">Developer Blog</a>
+			<nav>
+				<h2 class="visually-hidden">Top level navigation menu</h2>
+				<ul class="nav">
+					<li class="nav-item"><a href="/dev-blog/">Home</a></li>
+					<li class="nav-item"><a href="/dev-blog/blog/">Archive</a></li>
+					<li class="nav-item"><a href="/dev-blog/about/">About Me</a></li>
+				</ul>
+			</nav>
+		</header>
+
+		<main id="skip">
+			
+<h1>Agility</h1>
+
+<ul class="post-metadata">
+	<li><time datetime="2024-06-24">24 June 2024</time></li>
+	<li><a href="/dev-blog/tags/domain-driven-design/" class="post-tag">Domain Driven Design</a>, </li>
+	<li><a href="/dev-blog/tags/microservices/" class="post-tag">Microservices</a></li>
+</ul>
+
+<p>This is the final part in a series of blog posts focused on maintainability of microservice based backends.
+The series will discuss issues around maintainability at different levels. In the <a href="/dev-blog/blog/ddd/">first post</a> we were looking at the code level, in the <a href="/dev-blog/blog/responsibility_boundaries/">second post</a> we were at the technical architecture level, and in this final post we're at the management level.</p>
+<h2 id="introduction" tabindex="-1">Introduction <a class="header-anchor" href="#introduction">#</a></h2>
+<p>In organisations characterised by short term focus and where activities concerned with gaining an understanding of the problem space are not valued or prioritised project management will often take decisions that will make the situation worse. In this post I've listed a few examples.</p>
+<h3 id="accumulating-tech-debt" tabindex="-1">Accumulating tech debt <a class="header-anchor" href="#accumulating-tech-debt">#</a></h3>
+<p>As the business expands some teams will no longer be able to deal with the cognitive load and responsibility boundaries will need to be altered. Sometimes this is done by placing new feature development with a different team and leaving the old team with the maintenance of the old solution. Often there is no agreed plan on when and how to migrate the old responsibilities to the new team and this results in a fragmented solution space that suffers from e.g. <a href="#inconsistent-responsibility-boundaries">Inconsistent responsibility boundaries</a>. Quite often the reason for not prioritizing the alignment is that the consequences of not doing so are underestimated.</p>
+<p></p><div style="background-color:#26394D; color: #c3c3c3; border-left: solid #37526F 4px; border-radius: 4px; padding:0.3em;">
+<span>
+<p style="margin-top:1em; text-align:center"><b>Real world example</b></p>
+<div style="margin:2em"><p></p>
+<p>A company entered a new country and needed to generalise the existing features to work in the new country but also build new country specific features. The  responsibilities for the existing solution were split between a stream-aligned team and a <code>complicated subsystems</code> team. When development started on adding support for the new country it was decided that it would be better for the complicated subsystems team to be a stream-aligned team, and a new solution based on this decision was built for the new country. Years passed, and the misalignment of the architectures for the different countries persisted. In the new country the team acted as a stream-aligned team and in the old country that role was still assigned to the old team. This caused confusion for the developers and all stakeholders. E.g. Triaging incoming service desk tickets was a big challenge because it was quite difficult for non-technical staff to determine ownership of specific tickets.</p>
+<p></p></div>
+<p></p>
+</span>
+</div><p></p>
+<h3 id="responsibility-is-delegated-based-on-roadmap-bandwidth" tabindex="-1">Responsibility is delegated based on roadmap bandwidth <a class="header-anchor" href="#responsibility-is-delegated-based-on-roadmap-bandwidth">#</a></h3>
+<p>In an organisation that has no clear idea of the domain landscape in their problem space and where this is not taken into consideration from project management and leadership responsibility of new projects are often delegated based on team availability. This is the most obvious way to delegate tasks as it optimises utilisation of manpower, but there is obviously no correlation between roadmap bandwidth and domain ownership, so this naturally leads to a scattered ownership landscape, e.g. <a href="#inconsistent-responsibility-boundaries">Inconsistent responsibility boundaries</a>. There is nothing inherently wrong in taking roadmap bandwidth into consideration but if there is no anchoring in domain ownership to help steer the decisions it quickly leads to entropy.</p>
+<p></p><div style="background-color:#26394D; color: #c3c3c3; border-left: solid #37526F 4px; border-radius: 4px; padding:0.3em;">
+<span>
+<p style="margin-top:1em; text-align:center"><b>Real world example</b></p>
+<div style="margin:2em"><p></p>
+<p>A team was responsible for a domain but only for the users located in some of the countries. For users from other countries the responsibility for the domain lied within a different team, even though the problem space (in this example) did not distinguish between users from different countries. This situation can e.g. occur when different countries requires different integrations and the implementation of those integrations are carried out over time correlated to when the company enters those countries. In those situations there is a possibility that the team that owns the domain does not have room in their roadmap when the time comes and the implementation task is then handed over to another team. This leads to the domain responsibility being scattered. Since, in this example, the country boundary does not exist in the domain, product evolution will happen across this boundary going forward, i.e. new features will/should be introduced and changed for all countries at the same time, however since the responsibility for all countries are not owned by a single team, implementing the new functionality would involve multiple teams leading to project and roadmap coordination work and possibly duplicated effort for the implementation.</p>
+<p></p></div>
+<p></p>
+</span>
+</div><p></p>
+<h3 id="responsibility-is-delegated-based-on-technology-familiarity" tabindex="-1">Responsibility is delegated based on technology familiarity <a class="header-anchor" href="#responsibility-is-delegated-based-on-technology-familiarity">#</a></h3>
+<p>When the implementation of a new business capability involves a specific technology already known by a subset of teams one of those teams will be selected for carrying out the implementation while completely disregarding if the new business capability belongs to a domain that the team is already responsible for. This leads to <a href="#shared-responsibility">Shared responsibility</a> or  <a href="#inconsistent-responsibility-boundaries">Inconsistent responsibility boundaries</a>. Responsibilities of new capabilities that belong to domains owned by other teams wíll get assigned to the team that has the experience with the technology and the team is effectively taking slices of the responsibilities that should belong to the other teams.</p>
+<p>It is not necessary for technology based knowledge to be tied to specific teams. The experienced team can act as mentors and share knowledge with other teams, or they can build generic (i.e. not domain specific) components, like libraries or services, that can be used by other teams that need to use the technology.</p>
+<h3 id="responsibility-is-delegated-based-on-solution-space" tabindex="-1">Responsibility is delegated based on solution space <a class="header-anchor" href="#responsibility-is-delegated-based-on-solution-space">#</a></h3>
+<p>A component of the system is taking on too much responsibility and is often involved when new features are developed. For this reason the team owning the component will often be delegated responsibility of business processes/capabilities that belong to domains owned by other teams. This is a variant of the dominant partner antipattern, in this case though, the system that crosses responsibility boundaries is built in-house but the effects are the same. This situation often occur because developers are not even aware that multiple domains are involved. It can also occur because the ramifications of ending up in this situation is greatly underestimated.</p>
+<p>This is often seen when complex subsystem teams or platform teams builds generic components that gets entangled with the business domains. E.g. it could be a team owning a CRM product or a customer service product. If care is not taken to allow other teams to plug in to the generic component often the team owning the generic component ends up becoming a bottleneck and ends up taking slices of the domains of other teams, leading to <a href="#shared-responsibility">Shared responsibility</a> or  <a href="#inconsistent-responsibility-boundaries">Inconsistent responsibility boundaries</a>.</p>
+<h2 id="why-is-this-so-hard" tabindex="-1">Why is this so hard? <a class="header-anchor" href="#why-is-this-so-hard">#</a></h2>
+<p>People think they can take an iterative just-in-time approach with regards to requirement gathering (i.e domain understanding). They have an agile mindset and they think they can POC it, put it in production, gather feedback and then continuously re-iterate. There is nothing wrong with being agile but they don't realise the huge costs associated with rewriting the software. This is especially true for microservice architectures. If the refactoring goes beyond the boundaries of bounded contexts this means changing APIs and coordinating the new release with all involved teams. Perhaps even migrating existing state between services. If the architecture is event oriented it might also involve recreating the new events for historic data and reconstituting to all consumers.</p>
+<p>It is very difficult to detect the misalignment in realtime because quite often the consequences of the misinformed decisions do not appear until later when the solution must be evolved and it is no longer a good fit. By the time that the symptoms, such as a tightly coupled architecture, unclear responsibility boundaries, the constant need for refactoring projects and the build up of legacy code becomes visible, it is far too late.</p>
+<p>The business is not run by tech. There is often a big pressure from management to focus efforts on feature development and it can be a challenge to communicate the value of working on other tasks because they are often very technical in nature. This is a well known problem when dealing with e.g tech debt and it is also problem here.</p>
+<h2 id="how-to-fix-this-issue" tabindex="-1">How to fix this issue? <a class="header-anchor" href="#how-to-fix-this-issue">#</a></h2>
+<p>As a first measure you should try to assess your situation. If you're not currently following DDD or similar practices chances are that your solution is misaligned with the problem space. Take notice of people from the organisation speaking of areas of responsibilities that you were not aware of. &quot;I really want X (person or group of people) to take responsibility for Y&quot;. If this does not align with your reality then this is an indication that their view of the world is different than yours, that is, your understanding of the problem space conflicts with theirs. In this case your solution might be fitted well to your understanding of the problem space, but that understanding could be wrong or just not aligned with the rest of the organisation.</p>
+<p>The business or management might need some convincing before they will allow you to invest resources into improving your understanding of the problem space. The responsibility for doing this usually belongs to a head-of-tech or a CTO if such a role exists in your company. Try to give examples of projects from the past that were harder and took longer than they should have. Projects that were simple in the problem space but became very complex in the solution space. Perhaps you can find examples of projects that involved many teams and required coordination and project management and were difficult to roll out and test due to all the interdependencies even though the problem belonged to a single domain? Being able to deliver projects faster and give more reliable estimates constitute convincing arguments. You could also try to highlight the amount of legacy code that has been generated.</p>
+<p>Finally you might need to make adjustments to the organisation. Every domain should have a designated product owner who has the responsibility of keeping the understanding of the problem space up to date. That involves understanding how the business currently operates and how it is expected to evolve in the near or mid term future. The company should have designated architects. The architects will be in close contact with the stakeholders and product owners and keep an up to date model of the current and future domain landscape. They will understand the current architecture of the solution and be responsible for a target architecture that should strive to align the solution as much as possible with the domain landscape.</p>
+<h2 id="final-thoughts" tabindex="-1">Final thoughts <a class="header-anchor" href="#final-thoughts">#</a></h2>
+<p>Software design is an inherent iterative process. Most of the industry have now moved on from the days of the waterfall process and learned that splitting the process into a design and an implementation phase is almost never feasible. The devil is in the details and even small development tasks can't be designed up front because often new details and unforeseen obstacles appear while coding. However, the fact that development is carried out in an agile fashion should not lead one to believe that gathering requirements and understanding the problem space can wait till the very last moment. The misalignment between the problem space and the solution space that this approach allows to exist will negatively impact maintainability and thus profitability in the long run.</p>
+<p>You can build your design and abstractions based on your intuitions and, depending on how well you know the domain, they'll probably fit well enough, at least for some time, but if the product lives long enough, sooner or later it will catch up to you and the design overhaul will become a reality. This happens all the time. How many of the projects that you worked on were brownfield or greenfield projects? They're mostly greenfield on paper, but many of them are just a new generation of the old solution that no longer was able to fit the problem space. (there are of course other reasons why projects needs to be rebuilt, like deprecated tech stacks, mergers etc.) Again, this is not a big tragedy, but it certainly is very wasteful and not at all cost efficient in the long run. Thing is, budgets are often short lived and time to market is vital. This is often the reality and those factors should of course be weighed in when considering if and how DDD could be relevant. Just remember that projects tend to stay around much longer than the initial budget and if you intend to stay around as well you'll do your future self a huge disservice if you don't think ahead.</p>
+
+<ul class="links-nextprev"><li>Previous: <a href="/dev-blog/blog/responsibility_boundaries/">Responsibility boundaries</a></li><li>Next: <a href="/dev-blog/blog/fail_fast/">Reduce time to recover and embrace failing</a></li>
+</ul>
+
+		</main>
+
+		<footer></footer>
+
+		<!-- This page `/dev-blog/blog/agility/` was built on 2025-02-09T19:25:41.933Z -->
+	</body>
+</html>
