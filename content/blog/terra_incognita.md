@@ -2,6 +2,7 @@
 title: Terra Incognita
 description: In this post I discuss maintainability of systems built around the microservices architecture and try to emphasize the importance of investing into gaining a proper understanding of the problem space.
 date: 2024-06-21
+draft: true
 tags:
   - Domain Driven Design
   - Microservices
