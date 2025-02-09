@@ -8,20 +8,22 @@ tags:
 
 Some systems are of a complexity that a certain baseline of `run work` is unavoidable. If the system is large or complex or if there's a lot of ongoing feature development, issues will arise. In addition, sometimes systems are plagued with legacy and getting out of that situation is not something that can be achieved in the short to mid term.
 
-{% note 'Change - Improve - Run' %}
+{% note 'Explainer: Change - Improve - Run' %}
 
 It is common practice to split the work of a software engineer into three types: `change`, `run` and `improve`.
 `Change` denotes feature development, `run` is work needed to keep the system running and `improve` work are tasks that reduce the amount of run. Fixing a bug that is causing issues in production is an example of improve work because it will remove the run work associated with handling the incidents. Project managers will often pay attention to the proportion of run work that is required by a team and prioritize improve work accordingly. If run work is taking up a large amount of time it could be an indicator that improve work is not being sufficiently prioritized.
 
 {% endnote %}
 
-If you find yourself in a situation where run work is taking up a significant chunk of your time and there is nothing you can do about it from a project management perspective you should look at how you can optimize your run workflow. If you spend a lot of your time digging through logs, logging into various systems, copy pasting strings between applications etc. it might be worth considering how you can reduce this overhead. In this post I give an example of what I did on a project to help myself solve the run tasks faster.
+If you find yourself in a situation where run work is taking up a significant chunk of your time and there is nothing you can do about it from a project management perspective you should look at how you can optimize your run workflow. If you spend a lot of your time digging through logs, logging into various systems, copy pasting strings between applications etc. it might be worth considering how you can reduce this overhead.
 
-DISCLAIMER: The code samples shown in this post are for illustration purposes and are not extracted from any real system.
+One major issue with observability in general is maintaining a good logging hygiene. Maintaining a consistent practice of when and what to log out across the entire code base, having the right selection of log fields and ensuring the presence of required correlation IDs to allow tracing, both on the infrastructure layer and on the domain layer, is of vital importance, because not having this leads to a situation with a lot of inconsistency and lack of vital information in the logs, making them hard to use. In my experience, no matter how hard you try, logs will always be lacking to some extent, at least in systems that have been around for a while. It is close to impossible to predict what information is going to be relevant to have in the logs and there will therefore often be an adjustment period during which vital information will be missing. In addition, as a system evolves, it is often the case that changes to logging best practices are not applied to legacy code. It is therefore often very useful to have readonly access to the database in order to look up the exact state when debugging and troubleshooting.
+
+In this post I give an example of what I did on a project to help myself solve the run tasks faster. The tool presented here makes it easy to lookup data directly in the database and correlate with other data sources, and it makes it easy to execute mission control endpoints to rectify a bad situation.
 
 ## Context
 
-The backend was built using a microservice architecture, the services were running in kubernetes. Databases were running in AWS RDS. It was possible to get access to the database of a service via psql in the terminal. If an incident had caused bad state to be written to the database it was common practice to implement so called `mission control` endpoints for the service that could be used to execute a corrective action. It was also possible to request write access to the database and correct the data directly via sql. The mission control endpoints were usually implemented using graphql and engineers would execute their mission control endpoints via the graphql playground UI directly in the browser.
+The backend was built using a microservice architecture, the services were running in kubernetes. Databases were running in AWS RDS. It was possible to get access to the database of a service via psql in the terminal. If an incident had caused bad state to be written to the database it was common practice to implement so called `mission control` endpoints for the service that could be used to execute a corrective action. The mission control endpoints were usually implemented using graphql and engineers would execute their mission control endpoints via the graphql playground UI directly in the browser.
 
 There were several annoyances with this setup:
 
@@ -65,11 +67,15 @@ The next step would be going to the python console in Pycharm and trying to find
 
 {% image "./python_console.png", "", [900] %}
 
-After looking up the failed sagas in the console it turns out that a few of them failed due to a null pointer exception. Turns out there was a bug in the code triggered by an unexpected edge case. We fix the bug in the code and redeploy. The sagas that failed with this particular error can now be retried.
+After looking at the logs of the failed sagas it turns out that a few of them failed due to a null pointer exception. Turns out there was a bug in the code triggered by an unexpected edge case. We fix the bug in the code and redeploy. The sagas that failed with this particular error can now be retried.
 
 {% image "./retry_sagas_2.png", "", [1000] %}
 
-A `sagas.py` file, that was shared across all services, declared various functions that could be used to manage sagas. The reason the code in `sagas.py` could be shared across services was that the services were using the same saga library. The function for retrieving the set of failed sagas is very simple. It simply fetches the data from a database table and loads it into a pandas dataframe. Here's an excerpt from the `sagas.py` file:
+{% note 'Explainer' %}
+
+To add some context to the example above:
+
+A microservice called "dct" owned the sagas. A python package which was called "dct" contained all the methods that were relevant to operate the dct service. We used the methods from this package to access the saga state and to manipulate the sagas from the dct service. A `sagas.py` file, that was shared across all services, declared various functions that could be used to manage sagas. The reason the code in `sagas.py` could be shared across services was that the services were using the same saga library. The function for retrieving the set of failed sagas is very simple. It simply fetches the data from a database table and loads it into a pandas dataframe. Here's an excerpt from the `sagas.py` file:
 
 ```python
 import pandas as pd
@@ -82,22 +88,30 @@ def get_failed(db_name):
 ```
 
 
-The `transfer_service.py` file called this function:
+The `dct.py` file called this function:
 
 ```python 
-db_name = 'transferservice'
+db_name = 'dct'
 
 def get_failed_sagas():
     return sagas.get_failed(db_name)
 ```
 
-Let's say you needed more domain insights. As an example, it could be necessary to find out the amount of funds that had been withheld due to the stuck transfers. This can be achieved by looking up details from the transfer aggregates.
+{% endnote %}
 
-*In this case the ID of the transfer aggregates are the same as the corresponding sagaID (there is one saga for each aggregate), and to get the state of an aggregate a function called `state_apply` can be called which will return one row for each aggregate. The name state_apply comes from the fact that we were using event sourcing to store the state of the aggregates so getting the state of an aggregate implies folding the events of the aggregate event stream. We'll not go into more detail about this here.*
+Let's say you needed more domain insights. As an example, it could be necessary to find out the amount of funds that had been withheld due to the stuck transfers. This can be achieved by looking up details from the transfer aggregates.
 
 {% image "./amount.png", "", [900] %}
 
-Similary data can be fetched from other data sources, e.g. application logs, and because of the `everything is a dataframe` principle the data can be joined, grouped, aggregated and plotted freely.
+{% note 'Explainer' %}
+
+To add some context to the example above:
+
+In this case the ID of the transfer aggregates are the same as the corresponding sagaID (there is one saga for each aggregate), and to get the state of an aggregate a function called `state_apply` can be called which will return one row for each aggregate. The name state_apply comes from the fact that we were using event sourcing to store the state of the aggregates so getting the state of an aggregate implies folding the events of the aggregate event stream. The acronym "es" in the code is an abbreviation for "eventstream".
+
+{% endnote %}
+
+Similarly data can be fetched from other data sources, e.g. application logs, and because of the `everything is a dataframe` principle the data can be joined, grouped, aggregated and plotted freely.
 
 ## Notebooks
 
