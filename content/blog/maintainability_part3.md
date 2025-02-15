@@ -1,6 +1,6 @@
 ---
-title: Agility
-description: Building maintainable microservices - part 3
+title: "Building maintainable microservices - Part 3: Management level"
+description: Agility
 date: 2024-06-24
 tags:
   - Domain Driven Design
@@ -8,15 +8,41 @@ tags:
 ---
 
 This is the final part in a series of blog posts focused on maintainability of microservice based backends.
-The series will discuss issues around maintainability at different levels. In the <a href="/blog/ddd/">first post</a> we were looking at the code level, in the <a href="/blog/responsibility_boundaries/">second post</a> we were at the technical architecture level, and in this final post we're at the management level.
+The series will discuss issues around maintainability at different levels. In the <a href="/blog/maintainability_part1/">first post</a> we were looking at the design level, in the <a href="/blog/maintainability_part2/">second post</a> we were at the technical architecture level, and in this final post we're at the management level.
 
 ## Introduction
 
-In organisations characterised by short term focus and where activities concerned with gaining an understanding of the problem space are not valued or prioritised project management will often take decisions that will make the situation worse. In this post I've listed a few examples.
+In organisations characterised by short term focus and where activities concerned with gaining an understanding of the problem space are not valued or prioritised project management will often take decisions that will make the situation worse. Badly informed architecture decisions will be taken which will lessen the maintainability of the system over time and progress will slow to a grinding halt. What can the engineers do about it?
 
-### Accumulating tech debt
+## Accumulating tech debt
 
-As the business expands some teams will no longer be able to deal with the cognitive load and responsibility boundaries will need to be altered. Sometimes this is done by placing new feature development with a different team and leaving the old team with the maintenance of the old solution. Often there is no agreed plan on when and how to migrate the old responsibilities to the new team and this results in a fragmented solution space that suffers from e.g. [Inconsistent responsibility boundaries](#inconsistent-responsibility-boundaries). Quite often the reason for not prioritizing the alignment is that the consequences of not doing so are underestimated.
+Unpaid technical debt is a major culprit of bad maintainability. It can come in many shapes and forms.
+
+- **The system is buggy:** It can lack support for edge cases which means that engineers will need to intervene whenever those edge cases are hit in production. It can also have bad reliability causing incidents that will also eat away at your time.
+- **The system is badly designed:** Perhaps the requirements changed but the appropriate change to the design that should have been done to better accommodate the new requirements were never done, but instead hacks were added here and there to make it work. This make the solution harder to maintain.
+
+Sometimes technical debt is accumulated with your eyes open. You sprint towards a deadline and take short cuts. At other times technical debt arises because your understanding of the problem you were trying to solve was inadequate. We discussed this issue in detail in the <a href="/blog/maintainability_part1/">first post</a> in the series.
+
+If technical debt is managed properly it can be a powerful tool to steer velocity, to push when the opportunity is ripe, and to slow down at less opportune times to pay off accumulated debt. Your company will have a product/sales department that are constantly pushing the gas pedal and a tech department that are pushing the break pedal, and hopefully the management at your company has a good working relationship and are able to handle these two opposing forces in an optimal way.
+
+Communicating technical debt to management is notoriously difficult. One common approach is to annotate engineering work as either run, improve or change. Management can then follow along and intervene if run grows too large.
+
+{% note 'Explainer: Change - Improve - Run' %}
+
+It is common practice to split the work of a software engineer into three types: `change`, `run` and `improve`.
+`Change` denotes feature development, `run` is work needed to keep the system running and `improve` work are tasks that reduce the amount of run. Fixing a bug that is causing issues in production is an example of improve work because it will remove the run work associated with handling the incidents. Project managers will often pay attention to the proportion of run work that is required by a team and prioritize improve work accordingly. If run work is taking up a large amount of time it could be an indicator that improve work is not being sufficiently prioritized.
+
+{% endnote %}
+
+It is of course not a sufficient approach. The consequences of accumulating technical debt often doesn't appear until much later and will creep in without management noticing. Quantifying technical debt is very difficult, a possible alternative approach of communicating technical debt to management is to look at known antipatterns that causes technical debt. When these arise you can point them out to management. The <a href="/blog/responsibility_boundaries/">second post</a> in the series listed several examples.
+
+## Responsibility boundaries
+
+Bad responsibility boundaries is another major culprit of bad maintainability, especially in microservice based architectures. We discussed this issue in detail in the <a href="/blog/responsibility_boundaries/">second post</a> in the series. This section lists some common anti patterns that cause bad responsibility boundaries. When you identify one of these antipatterns you can point them out. The list is by no means exhaustive.
+
+### Unclear ownership
+
+As the business expands some teams will no longer be able to deal with the cognitive load and responsibility boundaries will need to be altered. Sometimes this is done by placing new feature development with a different team and leaving the old team with the maintenance of the old solution. Often there is no agreed plan on when and how to migrate the old responsibilities to the new team and this results in a fragmented solution space that suffers from e.g. [Inconsistent responsibility boundaries](../maintainability_part2#inconsistent-responsibility-boundaries). Quite often the reason for not prioritizing the alignment is that the consequences of not doing so are underestimated.
 
 {% note 'Real world example' %}
 
@@ -26,7 +52,7 @@ A company entered a new country and needed to generalise the existing features t
 
 ### Responsibility is delegated based on roadmap bandwidth
 
-In an organisation that has no clear idea of the domain landscape in their problem space and where this is not taken into consideration from project management and leadership responsibility of new projects are often delegated based on team availability. This is the most obvious way to delegate tasks as it optimises utilisation of manpower, but there is obviously no correlation between roadmap bandwidth and domain ownership, so this naturally leads to a scattered ownership landscape, e.g. [Inconsistent responsibility boundaries](#inconsistent-responsibility-boundaries). There is nothing inherently wrong in taking roadmap bandwidth into consideration but if there is no anchoring in domain ownership to help steer the decisions it quickly leads to entropy.
+In an organisation that has no clear idea of the domain landscape in their problem space and where this is not taken into consideration from project management and leadership responsibility of new projects are often delegated based on team availability. This is the most obvious way to delegate tasks as it optimises utilisation of manpower, but there is obviously no correlation between roadmap bandwidth and domain ownership, so this naturally leads to a scattered ownership landscape, e.g. [Inconsistent responsibility boundaries](../maintainability_part2#inconsistent-responsibility-boundaries). There is nothing inherently wrong in taking roadmap bandwidth into consideration but if there is no anchoring in domain ownership to help steer the decisions it quickly leads to entropy.
 
 {% note 'Real world example' %}
 
@@ -36,15 +62,15 @@ A team was responsible for a domain but only for the users located in some of th
 
 ### Responsibility is delegated based on technology familiarity
 
-When the implementation of a new business capability involves a specific technology already known by a subset of teams one of those teams will be selected for carrying out the implementation while completely disregarding if the new business capability belongs to a domain that the team is already responsible for. This leads to [Shared responsibility](#shared-responsibility) or  [Inconsistent responsibility boundaries](#inconsistent-responsibility-boundaries). Responsibilities of new capabilities that belong to domains owned by other teams wíll get assigned to the team that has the experience with the technology and the team is effectively taking slices of the responsibilities that should belong to the other teams.
+When the implementation of a new business capability involves a specific technology already known by a subset of teams one of those teams will be selected for carrying out the implementation while completely disregarding if the new business capability belongs to a domain that the team is already responsible for. This leads to [Shared responsibility](../maintainability_part2#shared-responsibility) or  [Inconsistent responsibility boundaries](../maintainability_part2#inconsistent-responsibility-boundaries). Responsibilities of new capabilities that belong to domains owned by other teams wíll get assigned to the team that has the experience with the technology and the team is effectively taking slices of the responsibilities that should belong to the other teams.
 
 It is not necessary for technology based knowledge to be tied to specific teams. The experienced team can act as mentors and share knowledge with other teams, or they can build generic (i.e. not domain specific) components, like libraries or services, that can be used by other teams that need to use the technology.
 
 ### Responsibility is delegated based on solution space
 
-A component of the system is taking on too much responsibility and is often involved when new features are developed. For this reason the team owning the component will often be delegated responsibility of business processes/capabilities that belong to domains owned by other teams. This is a variant of the dominant partner antipattern, in this case though, the system that crosses responsibility boundaries is built in-house but the effects are the same. This situation often occur because developers are not even aware that multiple domains are involved. It can also occur because the ramifications of ending up in this situation is greatly underestimated.
+A component of the system is taking on too much responsibility and is often involved when new features are developed. For this reason the team owning the component will often be delegated responsibility of business processes/capabilities that belong to domains owned by other teams. This situation often occur because developers are not even aware that multiple domains are involved. It can also occur because the ramifications of ending up in this situation is greatly underestimated.
 
-This is often seen when complex subsystem teams or platform teams builds generic components that gets entangled with the business domains. E.g. it could be a team owning a CRM product or a customer service product. If care is not taken to allow other teams to plug in to the generic component often the team owning the generic component ends up becoming a bottleneck and ends up taking slices of the domains of other teams, leading to [Shared responsibility](#shared-responsibility) or  [Inconsistent responsibility boundaries](#inconsistent-responsibility-boundaries).
+This is often seen when complex subsystem teams or platform teams builds generic components that gets entangled with the business domains. E.g. it could be a team owning a CRM product or a customer service product. If care is not taken to allow other teams to plug in to the generic component often the team owning the generic component ends up becoming a bottleneck and ends up taking slices of the domains of other teams, leading to [Shared responsibility](../maintainability_part2#shared-responsibility) or  [Inconsistent responsibility boundaries](../maintainability_part2#inconsistent-responsibility-boundaries).
 
 ## Why is this so hard?
 

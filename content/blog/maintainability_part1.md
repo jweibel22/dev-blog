@@ -1,6 +1,6 @@
 ---
-title: "DDD: What is it good for?"
-description: Building maintainable microservices - part 1
+title: "Building maintainable microservices - Part 1: Design level"
+description: "DDD: What is it good for?"
 date: 2024-06-22
 tags:
   - Domain Driven Design
@@ -12,9 +12,9 @@ The series will discuss issues around maintainability at different levels, we st
 
 ## Introduction
 
-I often encounter the attitude that DDD is not worth the effort and in my opinion those developers are underestimating the impact it can have. When developing a distributed backend, I believe that DDD is a vital tool for decomposing the backend into smaller decoupled and autonomous components (e.g. microservices) and ensure clear and stable responsibility boundaries. In my opinion, building a microservice backend without an up front and continuous effort into understanding the problem space, e.g. by employing DDD, is a blatant mistake. A mistake that I see happening too often. Obviously the real world does not allow for idealism. Time to market and budgets demands short term focus rather than long term planning but it is the responsibility of the software developer or architect to make good and conscious decisions and I believe that even small efforts can have a compounding effect that will help scalability and maintainability on the mid to long term. Conversely, neglecting it will have adverse effects, impacting the ability to evolve the software and react to changing requirements eventually leading to stagnating productivity.
+You're most likely already familiar with some of these coding best practices that aim at helping developers write more maintainable code: `Clean code`, the `SOLID` principles, `hexagonical architecture`, `GoF design patterns`. One factor that is often overlooked, especially by junior engineers, is the relationship between your understanding of the problem space, or lack thereof, and the maintainability of the code that you produce. It is in fact really banal, but nonetheless something that is often overlooked and therefore necessary to point out.
 
-DDD is a very large topic. This post will not be going into details about DDD, and although some familiarity with DDD concepts is a good prerequisite, the text can be read without prior knowledge, but the reader is encouraged to read up on DDD later. The post will not discuss all benefits and consequences of applying DDD, rather it will focus on a single aspect only, the maintainability/adaptability of the software.
+One vital tool in bridging the gap between the problem space and the solution space is Domain Driven Design. This post will not be discussing DDD in detail, but will instead focus on the problem that DDD is trying to solve. The reader is encouraged to look up DDD after reading through this post.
 
 ## Problem space and solution space
 
@@ -75,3 +75,7 @@ The misalignment between the problem space and solution space is not apparent wh
 As mentioned, when your code base does not have the high cohesion/low coupling characteristics maintainability and evolution of the solution will be harder. However, in a distributed system the evolution of the solution might happen in another team that will then suffer the consequences of the bad choices made by your team. This is very common. This means that you will not yourself suffer the consequences of your bad choices. This can mean that teams do not learn from their mistakes. The price is paid in slower development and a less robust solution throughout the organisation, but it is not at all easy to see the cause and effect from a local perspective. Therefore architects with more of an overview are needed for sparring.
 
 Every time you need to do a bug fix or refactoring task, think about how you ended up in this situation. Did it happen due to not putting enough consideration/effort into the original solution, e.g. because of time constraints, or was the original solution actually thorough, but the issue arose because of incomplete understanding of the problem that was being solved? If the latter case occurs often it is time to put more focus on practices aimed at improving your understanding of the problem space in due time (i.e. not just-in-time)
+
+## DDD to the rescue
+
+I often encounter the attitude that DDD is not worth the effort and in my opinion those developers are underestimating the impact it can have. When developing a distributed backend, I believe that DDD is a vital tool for decomposing the backend into smaller decoupled and autonomous components (e.g. microservices) and ensure clear and stable responsibility boundaries. In my opinion, building a microservice backend without an up front and continuous effort into understanding the problem space, e.g. by employing DDD, is a blatant mistake. A mistake that I see happening too often. Obviously the real world does not allow for idealism. Time to market and budgets demands short term focus rather than long term planning but it is the responsibility of the software developer or architect to make good and conscious decisions and I believe that even small efforts can have a compounding effect that will help scalability and maintainability on the mid to long term. Conversely, neglecting it will have adverse effects, impacting the ability to evolve the software and react to changing requirements eventually leading to stagnating productivity.

@@ -1,6 +1,6 @@
 ---
-title: Responsibility boundaries
-description: Building maintainable microservices - part 2
+title: "Building maintainable microservices - Part 2: Architecture level"
+description: A look at responsibility boundaries
 date: 2024-06-23
 tags:
   - Domain Driven Design
@@ -8,17 +8,19 @@ tags:
 ---
 
 This is part 2 in a series of blog posts focused on maintainability of microservice based backends.
-The series will discuss issues around maintainability at different levels. In the <a href="/blog/ddd/">first post</a> we were looking at the code level, in this post we're at the technical architecture level.
+The series will discuss issues around maintainability at different levels. In the <a href="/blog/maintainability_part1/">first post</a> we were looking at the design level, in this post we're at the technical architecture level.
 
 ## Introduction
 
 When a system based on a microservice architecture is implemented without a proper understanding of the problem space it will result in accidental complexity, unintentional coupling and a tightly coupled architecture in general. This has many negative consequences but, as mentioned, in this post we will focus on maintainability. When the misalignment is allowed to exist you'll often be able to notice the consequences by observing the responsibility boundaries that exist between the bounded contexts in your backend. Some bounded contexts will have multiple responsibilities, some bounded contexts will share responsibilities with each other, and some boundaries will simply be unclear.
 
-In this post, we'll be focusing on challenges that arise when building systems using a microservice architecture. From the perspective of the single responsibility principle a microservice is just like any other component (e.g. classes or modules). However, microservice boundaries are a lot more rigid because they involve network and often team boundaries. This means that the single responsibility principle becomes even more important, because once you break it, it is much harder to refactor and correct the issue.
+{% note 'Bounded context' %}
 
 Throughout this blog post I will be using the term `bounded context`. The term comes from DDD and defines the boundary inside of which the "ubiquitous" language is well defined, i.e. where terms from the language has a single definition. Outside of it a term from the language may have a different meaning. In a microservice architecture the ownership of the solution is usually separated into multiple independent teams, as having the ability to do so is usually one of the primary reasons for choosing a microservice architecture. As each team is independent it follows that teams will not be sharing bounded contexts as that would require the teams to agree on every term used in their codes bases. On the other hand, it is possible for a single team to have multiple bounded contexts, e.g. they could be owning two services that both refer to the term `Product` but with different meanings. In this text, when the term `bounded context` is used you can also think "team" as a bounded context originates from a single team.
 
-*In the rest of the post I will be assuming that teams are organised as stream-aligned/vertical teams. I.e. teams that has the power to take full stack domain ownership. If teams are instead organised in layers, e.g. a database team, a service team and a front-end team, it changes the discussion.*
+{% endnote %}
+
+In this post, we'll be focusing on challenges that arise when building systems using a microservice architecture. From the perspective of the single responsibility principle a microservice is just like any other component (e.g. classes or modules). However, microservice boundaries are a lot more rigid because they involve network and often team boundaries. This means that the single responsibility principle becomes even more important, because once you break it, it is much harder to refactor and correct the issue.
 
 There are three common cases of bad responsibility boundaries that you'll encounter, let's go through them here.
 
@@ -28,7 +30,7 @@ There are three common cases of bad responsibility boundaries that you'll encoun
 
 Because the implementation of the business capabilities are entangled in the code it will be difficult to evolve them independently. This can happen on many levels, it could be an aggregate inside a service taking up too much responsibility, it could be a service or a bounded context.
 
-### Shared responsiblity
+### Shared responsibility
 
 **The implementation of a single responsibility from the problem space is scattered between two or more independent components in the solution space.**
 
@@ -45,6 +47,16 @@ From the perspective of dependent teams that must implement business rules or pr
 A Business capability is owned by a single team A, except for the cases where the users logged in are coming from country C, in those cases the business capability is owned by team B.
 
 This will obviously make it harder to evolve the business capability because both team A and team B will need to be involved, at least if feature parity is a concern. It will also likely cause a lot of duplicated effort.
+
+### Chaos
+
+**Responsibilities boundaries are not based on the problem space at all. They're based on competencies or are accidental**
+
+In this scenario the problem space is not even taken into consideration. This is the most extreme situation and it is total chaos. In this situation all 3 scenarios mentioned above are present at the same time. It is a very common situation and the default state many organisations get into when they have no knowledge of DDD or team topologies.
+
+Teams could e.g. be based on different competencies, there's a frontend team, a backend team, a database team etc and each team must know about all aspects of the problem space and how it intersects with the layer they're responsible for.
+
+In other cases teams are formed without much consideration and responsibility boundaries are purely accidental. When your architect utters the sentence "for historical reasons" several times a day you're most likely facing this scenario.
 
 ## Anti-patterns
 
@@ -117,7 +129,7 @@ While having a good understanding of your own domain is paramount it is not suff
 
 ## Why is this so hard?
 
-A primary reason why these things happen is because the developers has insufficient understanding of the problem space and/or do not understand the importance of aligning the problem space with the solution space, as discussed in the <a href="/blog/ddd/">first post</a>.
+A primary reason why these things happen is because the developers has insufficient understanding of the problem space and/or do not understand the importance of aligning the problem space with the solution space, as discussed in the <a href="/blog/maintainability_part1/">first post</a>.
 
 Another common reason is being too strict about adhering to the DRY principle, don't repeat yourself. 
 
