@@ -2,17 +2,17 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 	
 	<url>
-		<loc>https://example.com/dev-blog/blog/ddd/</loc>
+		<loc>https://example.com/dev-blog/blog/maintainability_part1/</loc>
 		<lastmod>2024-06-22</lastmod>
 	</url>
 	
 	<url>
-		<loc>https://example.com/dev-blog/blog/responsibility_boundaries/</loc>
+		<loc>https://example.com/dev-blog/blog/maintainability_part2/</loc>
 		<lastmod>2024-06-23</lastmod>
 	</url>
 	
 	<url>
-		<loc>https://example.com/dev-blog/blog/agility/</loc>
+		<loc>https://example.com/dev-blog/blog/maintainability_part3/</loc>
 		<lastmod>2024-06-24</lastmod>
 	</url>
 	
@@ -43,46 +43,46 @@
 	
 	<url>
 		<loc>https://example.com/dev-blog/about/</loc>
-		<lastmod>2025-02-09</lastmod>
+		<lastmod>2025-02-15</lastmod>
 	</url>
 	
 	<url>
 		<loc>https://example.com/dev-blog/blog/</loc>
-		<lastmod>2025-02-09</lastmod>
+		<lastmod>2025-02-15</lastmod>
 	</url>
 	
 	<url>
 		<loc>https://example.com/dev-blog/</loc>
-		<lastmod>2025-02-09</lastmod>
+		<lastmod>2025-02-15</lastmod>
 	</url>
 	
 	<url>
 		<loc>https://example.com/dev-blog/tags/</loc>
-		<lastmod>2025-02-09</lastmod>
-	</url>
-	
-	<url>
-		<loc>https://example.com/dev-blog/tags/domain-driven-design/</loc>
-		<lastmod>2025-02-09</lastmod>
-	</url>
-	
-	<url>
-		<loc>https://example.com/dev-blog/tags/microservices/</loc>
-		<lastmod>2025-02-09</lastmod>
-	</url>
-	
-	<url>
-		<loc>https://example.com/dev-blog/tags/data/</loc>
-		<lastmod>2025-02-09</lastmod>
-	</url>
-	
-	<url>
-		<loc>https://example.com/dev-blog/tags/developer-productivity/</loc>
-		<lastmod>2025-02-09</lastmod>
+		<lastmod>2025-02-15</lastmod>
 	</url>
 	
 	<url>
 		<loc>https://example.com/dev-blog/tags/ai/</loc>
-		<lastmod>2025-02-09</lastmod>
+		<lastmod>2025-02-15</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://example.com/dev-blog/tags/developer-productivity/</loc>
+		<lastmod>2025-02-15</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://example.com/dev-blog/tags/data/</loc>
+		<lastmod>2025-02-15</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://example.com/dev-blog/tags/domain-driven-design/</loc>
+		<lastmod>2025-02-15</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://example.com/dev-blog/tags/microservices/</loc>
+		<lastmod>2025-02-15</lastmod>
 	</url>
 </urlset>
