@@ -9,6 +9,8 @@ const { EleventyHtmlBasePlugin } = require("@11ty/eleventy");
 
 const pluginDrafts = require("./eleventy.config.drafts.js");
 const pluginImages = require("./eleventy.config.images.js");
+const mermaid = require("@kevingimbel/eleventy-plugin-mermaid");
+
 
 /** @param {import('@11ty/eleventy').UserConfig} eleventyConfig */
 module.exports = function(eleventyConfig) {
@@ -37,6 +39,14 @@ module.exports = function(eleventyConfig) {
 	eleventyConfig.addPlugin(pluginNavigation);
 	eleventyConfig.addPlugin(EleventyHtmlBasePlugin);
 	eleventyConfig.addPlugin(pluginBundle);
+
+	// this must be added after the syntax highlight plugin (because that plugin overrides the markdownHighlighter)
+	eleventyConfig.addPlugin(mermaid, {
+		mermaid_config: {
+			'startOnLoad': true,
+			'theme': 'dark'
+		  }
+	});
 
 	// Filters
 	eleventyConfig.addFilter("readableDate", (dateObj, format, zone) => {
