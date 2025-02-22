@@ -34,9 +34,9 @@ stateDiagram-v2
     Failed --> [*]: Publish FailedIntegrationEvent
 ```
 
-Each node in the graph represents a state on the OrderFlowAggregate and each edge represents a transition between the states. When a customer wants to complete an order, the items are reserved to ensure they're in stock and the customer's credit card is charged. If the items are not in stock or the credit card fails the order fails. As the last step an integration event is published to notify other systems that the order has succeeded or failed.
+Each node in the graph represents a state on the `Order` aggregate and each edge represents a transition between the states. When a customer wants to complete an order, the items are reserved to ensure they're in stock and the customer's credit card is charged. If the items are not in stock or the credit card fails the order fails. As the last step an integration event is published to notify other systems that the order has succeeded or failed.
 
-Here's a naive implementation where the saga is implemented as event handlers on the OrderAggregate in go:
+Here's a naive implementation where the saga is implemented as event handlers on the Order aggregate in go:
 
 
 ```go
@@ -44,7 +44,7 @@ type SagaHandler struct {
 	publisher *Publisher
 }
 
-func (s *SagaHandler) HandleStarted(ctx context.Context, uow *UOW, started *Started) error {
+func (s *SagaHandler) HandleStarted(ctx context.Context, uow *UnitOfWork, started *Started) error {
 	err := stockService.ReserveItemsForCustomer() // idempotent call to external service
 	switch {
 	case err == nil:
@@ -56,7 +56,7 @@ func (s *SagaHandler) HandleStarted(ctx context.Context, uow *UOW, started *Star
 	return err // this is a transient error, return error to retry
 }
 
-func (s *SagaHandler) HandleItemsReserved(ctx context.Context, uow *UOW, itemsReserved *ItemsReserved) error {
+func (s *SagaHandler) HandleItemsReserved(ctx context.Context, uow *UnitOfWork, itemsReserved *ItemsReserved) error {
 	err := cardService.ChargeCreditCard() // idempotent call to external service
 	switch {
 	case err == nil:
@@ -68,20 +68,12 @@ func (s *SagaHandler) HandleItemsReserved(ctx context.Context, uow *UOW, itemsRe
 	return err // this is a transient error, return error to retry
 }
 
-func (s *SagaHandler) HandleNoMoneyOnCard(ctx context.Context, uow *UOW, failed *NoMoneyOnCard) error {
+func (s *SagaHandler) HandleNoMoneyOnCard(ctx context.Context, uow *UnitOfWork, failed *NoMoneyOnCard) error {
 	err := stockService.RemoveReservation() // what if this fails with an unexpected BadRequest, how do we fix the broken flow?
 	if err != nil {
 		return err
 	}
 	return uow.Save(&Failed{})
-}
-
-func (s *SagaHandler) HandleSucceeded(ctx context.Context, uow *UOW, succeeded *Succeeded) error {
-	return s.publisher.Publish(&SucceededIntegrationEvent{})
-}
-
-func (s *SagaHandler) HandleFailed(ctx context.Context, uow *UOW, failed *Failed) error {
-	return s.publisher.Publish(&FailedIntegrationEvent{})
 }
 
 ```
@@ -154,18 +146,22 @@ In the below example we're constructing the saga explicitly using a saga library
   var (
     sagaName            = types.Name("completeOrderFlow")
     saga                = factory.NewSaga(sagaName)
-    reserveItems        = tasks.NewReserveItems()
-    chargeCreditCard    = tasks.NewChargeCreditCard()
-    removeReservation   = tasks.NewRemoveReservation()
+    reserveItems        = tasks.NewReserveItems() // call stock service to reserve items
+    chargeCreditCard    = tasks.NewChargeCreditCard() // charge credit card
+    removeReservation   = tasks.NewRemoveReservation() // remove reservation in stock service
+    markCompleted       = tasks.NewMarkCompleted() // mark the Order aggregate as Completed
+    markFailed          = tasks.NewMarkFailed() // mark the Order aggregate as Failed
     done                = commontasks.NewDoneTask(saga)
   )
 
   dag := sagas.NewDag[SagaData](types.UnspecifiedVersion)
   dag.StartFrom(reserveItems).
       Transitions(
-        reserveItems.OnSuccess.GoTo(chargeCreditCard).OnFailure.GoTo(done),
-        chargeCreditCard.OnSuccess.GoTo(done).OnFailure.GoTo(removeReservation),
-        removeReservation.OnSuccess.GoTo(done),
+        reserveItems.OnSuccess.GoTo(chargeCreditCard).OnFailure.GoTo(markFailed),
+        chargeCreditCard.OnSuccess.GoTo(markCompleted).OnFailure.GoTo(removeReservation),
+        removeReservation.OnSuccess.GoTo(markFailed),
+        markCompleted.OnSuccess.GoTo(done)
+        markFailed.OnSuccess.GoTo(done)
   )
 
   saga.RegisterDag(dag)
@@ -204,8 +200,10 @@ func NewReserveItems(
   return task
 }
 
-func (i *ReserveItems) Execute(ctx context.Context) (sagas.Command[SagaData], error) {
+func (i *ReserveItems) Execute(ctx context.Context, state *saga.State[Data]) (sagas.Command[SagaData], error) {
 	err := i.stockService.ReserveItemsForCustomer() // idempotent call to external service
+  // TODO: load the items to be reserved from the Order aggregate and pass them on to the call to the stockService
+
 	switch {
     case err == nil:
       // all good, follow the happy path
@@ -218,8 +216,6 @@ func (i *ReserveItems) Execute(ctx context.Context) (sagas.Command[SagaData], er
 	return err // this is a transient error, return error to retry
 }
 ```
-
-The example here is leaving out several details, e.g. the `ReserveItems` task would need to load the state of the `Order` aggregate and pass in data from the aggregate state to the call to the stock service, but it's left out for brevity.
 
 The `removeReservation` task has a single connector, OnSuccess, there is no OnFailure connector as there is no expected way it can fail. If it fails for unexpected reasons the task will move the saga into the `FailedWithUnknownError` state. This is a special state that all sagas can end up in. The `FailedWithUnknownError` state is used to handle all the situations that cannot be handled automatically, either because they were unexpected and therefore the saga code did not take that scenario into consideration, or because there simply is no supported way to handle the situation automatically.
  When a saga is in that state it must be moved out of the state manually by calling one of the methods on the `mission control` API that we've mentioned previously.
@@ -241,7 +237,7 @@ func NewRemoveReservation(
   return task
 }
 
-func (i *RemoveReservation) Execute(ctx context.Context) (sagas.Command[SagaData], error) {
+func (i *RemoveReservation) Execute(ctx context.Context, state *saga.State[Data]) (sagas.Command[SagaData], error) {
 	err := i.stockService.RemoveReservation()
     if err != nil {
       if errors.Is(err, BadRequest) {
@@ -257,6 +253,34 @@ func (i *RemoveReservation) Execute(ctx context.Context) (sagas.Command[SagaData
 
 Notice that if for some reason the saga framework fails to persist the decision about where to go next this will also result in the call to Execute to be automatically retried. Therefore it is essential that the side effect carried out in the Execute method is idempotent.
 
+Finally the `MarkCompleted` task tells the `Order` aggregate that the process has completed successfully.
+
+```go
+type MarkCompleted struct {
+  *sagas.Task[SagaData]
+
+  OnSuccess *sagas.Connector[SagaData]
+}
+
+func NewMarkCompleted(
+) *MarkCompleted {
+  task := &MarkCompleted{
+    Task: sagas.NewTask[SagaData](),
+  }
+  task.OnSuccess = sagas.NewConnector[SagaData](task)
+
+  return task
+}
+
+func (i *MarkCompleted) Execute(ctx context.Context, state *sagas.State[Data]) (sagas.Command[SagaData], error) {
+  err = i.aggregateManager.ExecuteCommand(state.ID, &Completed{}) //saga ID is the same as the Order ID
+  if err != nil {
+      return nil, err
+  }  
+  return sagas.Next(i.OnSuccess.Resolve(state)), nil // reservation removed successfully, move to next task
+}
+```
+
 The `commontask.Done` is provided by the library and simply completes the saga:
 
 ```go
@@ -270,14 +294,14 @@ func NewDoneTask[Data any]() *Complete[Data] {
 	}
 }
 
-func (task *Done[Data]) Execute(ctx context.Context, sagaState *saga.State[Data]) (sagas.Command[Data], error) {
+func (task *Done[Data]) Execute(ctx context.Context, state *saga.State[Data]) (sagas.Command[Data], error) {
 	return sagas.Complete[Data](), nil
 }
 ```
 
-Instead of transitioning to the Done task the `ReserveItems` could simply have completed the saga when it was done by calling `sagas.Complete()` itself. The benefit of having `ReserveItems` transition to the `Done` task and let `Done` complete the saga is that if we later need to refactor the saga in a way where `ReserveItems` is no longer the last task in the saga we won't have to make changes to `ReserveItems` to make it work, we can simply rewire the connectors, i.e. it makes the `ReserveItems` adhere to the Open/Closed principle.
+Instead of transitioning to the `OnSuccess` task the `MarkCompleted` could simply have completed the saga when it was done by calling `sagas.Complete()` itself. The benefit of having `MarkCompleted` transition to the `OnSuccess` task and let `Done` complete the saga is that if we later need to refactor the saga in a way where `MarkCompleted` is no longer the last task in the saga we won't have to make changes to `MarkCompleted` to make it work, we can simply rewire the connectors, i.e. it makes the `MarkCompleted` adhere to the Open/Closed principle.
 
-Finally observe that there is no longer a NoMoneyOnCard domain event needed on the Order aggregate. It might still be relevant for domain specific reasons but it is not required to implement the saga. The Order aggregate now will only contain the domain events that are relevant to the domain. Also notice that the saga is not publishing integration events, this is kept separate as event handlers on the domain event as it has nothing to do with the saga.
+Finally observe that there is no longer a `NoMoneyOnCard` or `ItemsReserved` domain event needed on the `Order` aggregate. They are no longer required to implement the saga and the Order aggregate now will only contain the domain events that are relevant to the domain. The `Order` aggregate has a `Started` domain event and a `Completed` or `Failed` domain event, an order completing for failing is a significant business event as the user will need to be notified at this time. In this code example it is the saga's responsibility to tell the `Order` aggregate that it completed or failed, but it could also be something the `Order` aggregate found out in an event driven way, the best design depends on the situation.
 
 ## Conclusion
 
