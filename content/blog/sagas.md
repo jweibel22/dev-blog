@@ -36,7 +36,7 @@ stateDiagram-v2
 
 Each node in the graph represents a state on the `Order` aggregate and each edge represents a transition between the states. When a customer wants to complete an order, the items are reserved to ensure they're in stock and the customer's credit card is charged. If the items are not in stock or the credit card fails the order fails. As the last step an integration event is published to notify other systems that the order has succeeded or failed.
 
-Here's a naive implementation where the saga is implemented as event handlers on the Order aggregate in go:
+Here's a naive implementation where the saga is implemented as event handlers on the Order aggregate. The event handlers will be retried if they return an error.
 
 
 ```go
@@ -71,7 +71,7 @@ func (s *SagaHandler) HandleItemsReserved(ctx context.Context, uow *UnitOfWork, 
 func (s *SagaHandler) HandleNoMoneyOnCard(ctx context.Context, uow *UnitOfWork, failed *NoMoneyOnCard) error {
 	err := stockService.RemoveReservation() // what if this fails with an unexpected BadRequest, how do we fix the broken flow?
 	if err != nil {
-		return err
+		return err // hmmm what to do if this is not a transient error but e.g. a http 400 returned from the stock service
 	}
 	return uow.Save(&Failed{})
 }
@@ -90,11 +90,11 @@ The tiny toy example here does a bad job at illustrating this point because of i
 
 The business entity and the saga is modeled by the same object which makes it difficult to separate orchestration problems from business problems. E.g. for async remote calls it is necessary to write two events related to the call to the event store. First an event representing the intention to make the call and the following representing the result of the call. I.e. we would have domain events in our event store such as, AsyncCallToXStarted. Obviously this means that if we needed to make changes to the orchestration for technical reasons, replacing an async API with a sync API, implementing the change would involve making changes to the event stream which is also used to represent the state of the business entity.
 
-Another problem that I've encountered when the aggregate is modeled as an event sourced aggregate is how to handle event replay. Replaying events is a common practice in event sourcing which allows e.g. to rebuild views that are based on the events from the event store, however since the saga actions are implemented as event handlers on those events this can result in unwanted side effects as already completed sagas would then start making remote calls.
+Another problem that I've encountered when the aggregate is modeled as an event sourced aggregate is how to handle event replay. Replaying events is a common practice in event sourcing which allows e.g. to rebuild views that are based on the events from the event store, however since the saga actions are implemented as event handlers on those events this can result in unwanted side effects as already completed sagas would then start making remote calls. If instead the saga was a separate entity it would know that it had already executed and could ignore the events that would otherwise trigger it.
 
 ### Problem 3: Implementing orchestrating sagas is non trivial
 
-Implementing orchestrating sagas is non trivial and operating a saga requires many capabilities that are not domain specific. It involves keeping track of the saga state, implementing retries and keeping track of stuck or failed sagas. A saga can get stuck due to some remote system not responding or an expected event not arriving, they can end up in an unexpected situation from which they can't progress needing human assistance. We find ourselves implementing the same patterns over and over again, e.g. implementing observability and endpoints that allow us to resume a stuck saga. E.g. what happens when the call fails because the other aggregate throws an unexpected error or there is a disagreement over the contract, how do you get the saga to continue once the issue or bug is gone?
+Implementing orchestrating sagas is non trivial and operating a saga requires many capabilities that are not domain specific. It involves keeping track of the saga state, implementing retries and keeping track of stuck or failed sagas. A saga can get stuck due to some remote system not responding or an expected event not arriving, they can end up in an unexpected situation from which they can't progress needing human assistance. In the above example consider what would happen if the stockService were to return a bad request in the `HandleNoMoneyOnCard` method. This would indicate that the request does not conform to the contract of the StockService API, i.e. it's a bug in the code and will need to be corrected. But how do we discover that this happens, how do we differentiate this type of error from a transient error that is expected to resolve itself? You'd most likely find yourself implementing the same patterns over and over again, e.g. implementing observability and endpoints that would allow you to discover and resume a stuck saga.
 
 ## Orchestration challenges
 
