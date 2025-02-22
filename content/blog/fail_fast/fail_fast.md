@@ -1,5 +1,5 @@
 ---
-title: Reduce time to recover and embrace failing
+title: Ops Driven Design
 description: A collection of ideas on how to design your system in a way that reduces the operational burden
 date: 2024-07-04
 tags:
