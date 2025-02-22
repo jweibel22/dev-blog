@@ -27,11 +27,6 @@
 	</url>
 	
 	<url>
-		<loc>https://example.com/dev-blog/blog/data_platform/</loc>
-		<lastmod>2024-08-02</lastmod>
-	</url>
-	
-	<url>
 		<loc>https://example.com/dev-blog/blog/sagas/</loc>
 		<lastmod>2024-09-27</lastmod>
 	</url>
@@ -72,17 +67,17 @@
 	</url>
 	
 	<url>
+		<loc>https://example.com/dev-blog/tags/data/</loc>
+		<lastmod>2025-02-22</lastmod>
+	</url>
+	
+	<url>
 		<loc>https://example.com/dev-blog/tags/domain-driven-design/</loc>
 		<lastmod>2025-02-22</lastmod>
 	</url>
 	
 	<url>
 		<loc>https://example.com/dev-blog/tags/microservices/</loc>
-		<lastmod>2025-02-22</lastmod>
-	</url>
-	
-	<url>
-		<loc>https://example.com/dev-blog/tags/data/</loc>
 		<lastmod>2025-02-22</lastmod>
 	</url>
 </urlset>
