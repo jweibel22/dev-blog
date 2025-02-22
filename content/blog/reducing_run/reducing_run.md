@@ -1,6 +1,6 @@
 ---
-title: How to run faster
-description: Sharing an example of how to build tooling that will make your run work faster
+title: Script Your Run Tasks
+description: Scripting makes run tasks easier, safer, and more traceable.
 date: 2024-07-24
 tags:
   - Developer productivity
