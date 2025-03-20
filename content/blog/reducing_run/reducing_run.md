@@ -132,7 +132,7 @@ The backend APIs all required valid JWTs. Obtaining a valid jwt for the active u
   headers['authorization'] = f"Bearer {get_access_token()}"
 ```
 
-Communication with the graphql APIs was done by forwarding to the remote port on kubernetes using the python kubernetes sdk. A configuration file `services.json` contained the names of all the backend services and a small script `generate_graphql.sh` could be used to generate client code for the graphql APIs of all the services.
+Communication with the graphql APIs was done by forwarding to the remote port on kubernetes using the python kubernetes sdk and a small script `generate_graphql.sh` could be used to generate client code for the graphql APIs of all the services.
 
 Communication with the service databases was also achieved using port forwarding. Credentials were obtained via the AWS RDS python client. If the aws credentials of the user had expired the python code would automatically initiate a login flow for the user in the browser by running `aws sso login`.
 

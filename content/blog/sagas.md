@@ -34,9 +34,9 @@ stateDiagram-v2
     Failed --> [*]: Publish FailedIntegrationEvent
 ```
 
-Each node in the graph represents a state on the `Order` aggregate and each edge represents a transition between the states. When a customer wants to complete an order, the items are reserved to ensure they're in stock and the customer's credit card is charged. If the items are not in stock or the credit card fails the order fails. As the last step an integration event is published to notify other systems that the order has succeeded or failed.
+Each node in the graph represents a state on the `Order` aggregate and each edge represents a transition between the states. When a customer wants to complete an order, the items are reserved to ensure they're in stock and the customer's credit card is charged. If the items are not in stock or the credit card fails the order fails.
 
-Here's a naive implementation where the saga is implemented as event handlers on the Order aggregate. The event handlers will be retried if they return an error.
+Consider this naive saga implementation. The Order aggregate is implemented using event sourcing and the saga is implemented as event handlers on the events representing the Order aggregate. The event handlers will be retried if they return an error.
 
 
 ```go
