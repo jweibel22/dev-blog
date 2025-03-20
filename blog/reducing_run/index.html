@@ -573,7 +573,7 @@ h2 + .header-anchor {
 <h2 id="integrations" tabindex="-1">Integrations <a class="header-anchor" href="#integrations">#</a></h2>
 <p>The backend APIs all required valid JWTs. Obtaining a valid jwt for the active user was fairly simple since the company was using okta. We defined a function <code>get_access_token</code> which would initiate a device authorization flow and fetch a new jwt token via the okta api, unless a valid token was already found locally. This function was used anywhere we needed a jwt token:</p>
 <pre class="language-python" tabindex="0"><code class="language-python">  headers<span class="token punctuation">[</span><span class="token string">'authorization'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string-interpolation"><span class="token string">f"Bearer </span><span class="token interpolation"><span class="token punctuation">{</span>get_access_token<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span></code></pre>
-<p>Communication with the graphql APIs was done by forwarding to the remote port on kubernetes using the python kubernetes sdk. A configuration file <code>services.json</code> contained the names of all the backend services and a small script <code>generate_graphql.sh</code> could be used to generate client code for the graphql APIs of all the services.</p>
+<p>Communication with the graphql APIs was done by forwarding to the remote port on kubernetes using the python kubernetes sdk and a small script <code>generate_graphql.sh</code> could be used to generate client code for the graphql APIs of all the services.</p>
 <p>Communication with the service databases was also achieved using port forwarding. Credentials were obtained via the AWS RDS python client. If the aws credentials of the user had expired the python code would automatically initiate a login flow for the user in the browser by running <code>aws sso login</code>.</p>
 <h2 id="caveats" tabindex="-1">Caveats <a class="header-anchor" href="#caveats">#</a></h2>
 <p>The solution depicted in this post, the interactive console and the notebooks, works so well because the language supports it. Most dynamically typed languages are well suited but even some statically typed languages, e.g. Scala, has similar features. However, your backend team might be using a language where this sort of tooling is difficult to build. In our case the language in use was not python so building and using the tooling required team members to learn python at a basic level, including parts of the standard library (date time and string manipulation etc.). Understanding and using pandas dataframes is also not trivial for engineers with no experience in the python language or data analysis.</p>
@@ -586,6 +586,6 @@ h2 + .header-anchor {
 
 		<footer></footer>
 
-		<!-- This page `/dev-blog/blog/reducing_run/` was built on 2025-02-22T06:30:28.611Z -->
+		<!-- This page `/dev-blog/blog/reducing_run/` was built on 2025-03-20T17:16:06.925Z -->
 	</body>
 </html>

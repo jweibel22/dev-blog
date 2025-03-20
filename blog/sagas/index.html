@@ -499,8 +499,8 @@ h2 + .header-anchor {
 <p>In my experience, unless your orchestration duties are very simple, this violation of the single responsibility principle will make your life harder than it should be, and my advice is to move the orchestration responsibilities out of the domain into a saga that is a purely technical construct and only has the responsibility of carrying out the orchestration and ensuring distributed consistency. If the business process you're modelling is complex it can make sense to represent this as a first class citizen in your domain, but you can still do that while keeping the responsibility of executing the orchestration in a separate saga implementation.</p>
 <p>Consider this toy example:</p>
 <pre class="mermaid">stateDiagram-v2&#10;    [*] --&gt; Started&#10;    Started --&gt; ItemsReserved: ReserveItemsForCustomer&#10;    Started --&gt; Failed: OutOfStock&#10;    ItemsReserved --&gt; Succeeded: ChargeCreditCard&#10;    ItemsReserved --&gt; NoMoneyOnCard: InsufficientFunds&#10;    NoMoneyOnCard --&gt; Failed: RemoveReservation&#10;    Succeeded --&gt; [*]: Publish SucceededIntegrationEvent&#10;    Failed --&gt; [*]: Publish FailedIntegrationEvent&#10;</pre>
-<p>Each node in the graph represents a state on the <code>Order</code> aggregate and each edge represents a transition between the states. When a customer wants to complete an order, the items are reserved to ensure they're in stock and the customer's credit card is charged. If the items are not in stock or the credit card fails the order fails. As the last step an integration event is published to notify other systems that the order has succeeded or failed.</p>
-<p>Here's a naive implementation where the saga is implemented as event handlers on the Order aggregate. The event handlers will be retried if they return an error.</p>
+<p>Each node in the graph represents a state on the <code>Order</code> aggregate and each edge represents a transition between the states. When a customer wants to complete an order, the items are reserved to ensure they're in stock and the customer's credit card is charged. If the items are not in stock or the credit card fails the order fails.</p>
+<p>Consider this naive saga implementation. The Order aggregate is implemented using event sourcing and the saga is implemented as event handlers on the events representing the Order aggregate. The event handlers will be retried if they return an error.</p>
 <pre class="language-go" tabindex="0"><code class="language-go"><span class="token keyword">type</span> SagaHandler <span class="token keyword">struct</span> <span class="token punctuation">{</span>
 	publisher <span class="token operator">*</span>Publisher
 <span class="token punctuation">}</span>
@@ -718,6 +718,6 @@ When a saga is in that state it must be moved out of the state manually by calli
 
 		<footer></footer>
 
-		<!-- This page `/dev-blog/blog/sagas/` was built on 2025-02-22T06:30:28.611Z -->
+		<!-- This page `/dev-blog/blog/sagas/` was built on 2025-03-20T17:16:06.925Z -->
 	</body>
 </html>
