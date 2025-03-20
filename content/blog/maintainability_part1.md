@@ -48,7 +48,7 @@ So what is a "reason to change" the code?
 
 The reason to change the code comes from the stakeholders that operate in the problem space. They want new or improved features. The stakeholders are coming from the business and are organised using the business org chart. E.g. at Amazon there could be a stakeholder Aaron from the "product" department and another stakeholder Bridget from the "checkout" department. Aaron is concerned with how products are organised and presented on the Amazon site, Bridget is concerned with the user experience after a purchase decision has been made, e.g. what does the email receipt after the purchase look like? So if Aaron asked you to make a change to how product information is presented and you accidentally also changed how it was shown on the email receipt because the component you altered was being used in both places (i.e. it was responsible for delivering product information to both) then your component does not have a single responsibility. The product page and the email receipt are independent concepts in the problem space because the business has been organised in such a way that they are the responsibility of different departments that each have their own stakeholders. For that reason they will probably change independently and for different reasons. If Aaron wants the product information to look differently there is no reason to expect that Bridget will want the same change or even be aware that Aaron has requested the change.
 
-So in this case the component was responsible for business logic of two unrelated concepts from the problem space. The concepts are unrelated in the problem space but they are highly related in the solution space because they are kept close together in the code.
+So in this case the component was responsible for business logic of two unrelated concepts from the problem space. This is referred to as low cohesion.
 
 {% simplequote 'Robert C. Martin', 'The Clean Code Blog' %}
 
@@ -56,7 +56,7 @@ However, as you think about this principle, remember that the reasons for change
 
 {% endsimplequote %}
 
-Having this misalignment of the problem space and solution space means that changing your solution will be hard. As the problem space evolves, applying a change  from the problem space to the solution space will be difficult due to the entangled mess. A change which is simple to express in the problem space will be hard to do in the solution space because the component responsible for the concept is coupled to other unrelated concepts from the problem space.
+Having this misalignment of the problem space and solution space means that changing your solution will be hard. As the problem space evolves, applying a change from the problem space to the solution space will be difficult due to the entangled mess. A change which is simple to express in the problem space will be hard to implement in the solution space because the component responsible for the concept that have changed also contains code of other unrelated concepts from the problem space that should not change.
 
 You can experience the inverse problem as well. Your component shares its responsibilities with other components. Those other components might even be owned by other teams. So when Aaron wants his change you'll need to make changes in multiple places in order for the change to be implemented. If multiple teams are owning the components this means coordination, meetings, project management etc. which could otherwise have been avoided.
 
